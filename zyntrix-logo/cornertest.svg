@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="600" height="200">
+<rect x="0" y="0" width="300" height="100" fill="white"/>
+<path d="M10 60 L10 30 A7 7 0 0 1 17 23 L47 23 Z" fill="black"/>
+<path d="M110 60 L110 30 A7 7 0 0 0 117 23 L147 23 Z" fill="black"/>
+<path d="M210 30 L260 30 A7 7 0 0 1 267 37 L267 67 A7 7 0 0 1 260 74 L210 74 Z" fill="none" stroke="black" stroke-width="3"/>
+<text x="20" y="90" font-size="10">sweep1</text>
+<text x="120" y="90" font-size="10">sweep0</text>
+</svg>

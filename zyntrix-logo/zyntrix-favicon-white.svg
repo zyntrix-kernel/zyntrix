@@ -1,0 +1,17 @@
+<svg fill="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Zyntrix logo"><title>Zyntrix</title>
+
+  <defs>
+    <linearGradient id="gz" gradientUnits="userSpaceOnUse" x1="64" y1="46" x2="186" y2="214">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#ffffff"/>
+      <stop offset="0.62" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="gr" gradientUnits="userSpaceOnUse" x1="19" y1="128" x2="233" y2="128">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+<g transform="translate(128 130) scale(1.22) translate(-128 -130)"><path d="M80 57 A7 7 0 0 1 87 50 L209 50 A7 7 0 0 1 216 57 L216 74.41 A7 7 0 0 1 204.35 100.36 L126.74 169.34 A2.6 2.6 0 0 0 126.99 170 L167 170 A7 7 0 0 1 174 177 L174 203 A7 7 0 0 1 167 210 L45 210 A7 7 0 0 1 38 203 L38 176.3 A7 7 0 0 1 44.3 170 L45.7 170 A2.6 2.6 0 0 0 56.71 165.81 L141.26 90.66 A2.6 2.6 0 0 0 141.01 90 L87 90 A7 7 0 0 1 80 83 Z" fill="url(#gz)"/></g>
+</svg>

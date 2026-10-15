@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyntrix — Logo Kit</title>
+<style>
+  :root{
+    --surface:#05011E; --surface-2:#0B0628; --primary:#A855F7; --primary-d:#6B1AC9;
+    --lav:#E9DCFF; --lav-2:#C9AFFF; --on-dark:#E9E2FF; --tag:#B3A1E0; --ink:#241243;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--surface);color:var(--on-dark);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh}
+  .wrap{max-width:1060px;margin:0 auto;padding:48px 20px 80px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+  header img{width:64px;height:64px}
+  h1{font-size:28px;font-weight:700;letter-spacing:.14em}
+  .sub{color:var(--tag);font-size:13px;letter-spacing:.32em;margin-bottom:44px}
+  h2{font-size:12px;font-weight:600;letter-spacing:.28em;color:var(--tag);margin:44px 0 16px;text-transform:uppercase}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{background:var(--surface-2);border:1px solid #1D1440;border-radius:24px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px}
+  .card.light{background:#FFFFFF;border-color:#E6E0F5}
+  .card img{max-width:100%}
+  .card .lbl{font-size:11px;letter-spacing:.22em;color:var(--tag);text-transform:uppercase}
+  .card.light .lbl{color:#8a7ab0}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
+  .chip{width:88px;border-radius:16px;overflow:hidden;border:1px solid #1D1440}
+  .chip .sw{height:56px}
+  .chip .nm{font-size:10px;padding:6px 4px;text-align:center;color:var(--tag);background:#0B0628;font-family:monospace}
+  a.dl{display:inline-block;margin-top:2px;font-size:11px;letter-spacing:.14em;color:var(--primary);text-decoration:none;border:1px solid #3d2270;border-radius:999px;padding:7px 16px;transition:.2s}
+  a.dl:hover{background:#1c1038}
+  .icons{display:flex;gap:18px;align-items:flex-end;justify-content:center}
+  .icons img{image-rendering:auto}
+  footer{margin-top:52px;text-align:center;color:#584a85;font-size:11px;letter-spacing:.18em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="svg/zyntrix-app-icon.svg" alt="Zyntrix app icon">
+    <div>
+      <h1>ZYNTRIX</h1>
+      <div class="sub">LOGO KIT · MATERIAL 3 · SVG</div>
+    </div>
+  </header>
+
+  <h2>Primary lockup — stacked</h2>
+  <div class="grid g2">
+    <div class="card"><img src="svg/zyntrix-lockup-stacked.svg" width="340" alt="Zyntrix stacked lockup on dark"><span class="lbl">Dark backgrounds</span><a class="dl" href="svg/zyntrix-lockup-stacked.svg" download>SVG</a></div>
+    <div class="card light"><img src="svg/zyntrix-lockup-stacked-light.svg" width="340" alt="Zyntrix stacked lockup on light"><span class="lbl">Light backgrounds</span><a class="dl" href="svg/zyntrix-lockup-stacked-light.svg" download>SVG</a></div>
+  </div>
+
+  <h2>Horizontal lockup</h2>
+  <div class="grid">
+    <div class="card"><img src="svg/zyntrix-lockup-horizontal.svg" width="640" alt="Zyntrix horizontal lockup"><span class="lbl">Headers · documents · signatures</span><a class="dl" href="svg/zyntrix-lockup-horizontal.svg" download>SVG</a>&nbsp;<a class="dl" href="svg/zyntrix-lockup-horizontal-light.svg" download>Light SVG</a></div>
+  </div>
+
+  <h2>Symbol</h2>
+  <div class="grid g3">
+    <div class="card"><img src="svg/zyntrix-symbol.svg" width="190" alt="Zyntrix symbol"><span class="lbl">Symbol · dark</span><a class="dl" href="svg/zyntrix-symbol.svg" download>SVG</a></div>
+    <div class="card light"><img src="svg/zyntrix-symbol-light.svg" width="190" alt="Zyntrix symbol light"><span class="lbl">Symbol · light</span><a class="dl" href="svg/zyntrix-symbol-light.svg" download>SVG</a></div>
+    <div class="card"><img src="svg/zyntrix-app-icon.svg" width="190" alt="Zyntrix app icon"><span class="lbl">App icon · M3 squircle</span><a class="dl" href="svg/zyntrix-app-icon.svg" download>SVG</a></div>
+    <div class="card light"><img src="svg/zyntrix-symbol-mono-black.svg" width="190" alt="Zyntrix one-colour black"><span class="lbl">One-colour · black</span><a class="dl" href="svg/zyntrix-symbol-mono-black.svg" download>SVG</a></div>
+    <div class="card"><img src="svg/zyntrix-symbol-mono-white.svg" width="190" alt="Zyntrix one-colour white"><span class="lbl">One-colour · white</span><a class="dl" href="svg/zyntrix-symbol-mono-white.svg" download>SVG</a></div>
+  </div>
+
+  <h2>Palette — M3 tonal roles</h2>
+  <div class="row">
+    <div class="chip"><div class="sw" style="background:#AE49F8"></div><div class="nm">#AE49F8<br>primary</div></div>
+    <div class="chip"><div class="sw" style="background:#6B1AC9"></div><div class="nm">#6B1AC9<br>primary-d</div></div>
+    <div class="chip"><div class="sw" style="background:#C9AFFF"></div><div class="nm">#C9AFFF<br>primary-c</div></div>
+    <div class="chip"><div class="sw" style="background:#E9DCFF"></div><div class="nm">#E9DCFF<br>on-primary</div></div>
+    <div class="chip"><div class="sw" style="background:#06021D"></div><div class="nm">#06021D<br>surface</div></div>
+    <div class="chip"><div class="sw" style="background:#F4EEFF"></div><div class="nm">#F4EEFF<br>spark</div></div>
+  </div>
+
+  <h2>Favicon &amp; web icons</h2>
+  <div class="card">
+    <div class="icons">
+      <img src="web/favicon-16.png" width="16" height="16" alt="favicon 16">
+      <img src="web/favicon-32.png" width="32" height="32" alt="favicon 32">
+      <img src="web/favicon-48.png" width="48" height="48" alt="favicon 48">
+      <img src="web/icon-192.png" width="96" height="96" alt="icon 192">
+      <img src="web/apple-touch-icon.png" width="120" height="120" alt="apple touch icon">
+    </div>
+    <span class="lbl">16 / 32 / 48 / 192 / 180 + favicon.ico · maskable · <a style="color:var(--primary)" href="web/head-snippet.html">head snippet</a></span>
+  </div>
+
+  <footer>ZYNTRIX · BUILD · CONFIGURE · EXPLORE</footer>
+</div>
+</body>
+</html>
