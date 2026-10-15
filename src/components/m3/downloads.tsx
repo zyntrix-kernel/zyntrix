@@ -5,7 +5,7 @@ import {
   Package,
   Terminal,
 } from "lucide-react";
-import { M3ButtonLink } from "./primitives";
+import { M3ButtonLink, SectionHeader } from "./primitives";
 import { WALLPAPER_FILES } from "@/lib/m3/theme";
 import type { M3Mode } from "@/lib/m3/theme";
 
@@ -28,18 +28,12 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
   const q = `source=${encodeURIComponent(source)}&mode=${mode}`;
 
   return (
-    <section id="download" className="px-4 py-10 sm:py-14" aria-labelledby="download-title">
+    <section id="download" className="px-4 py-14 sm:py-20" aria-labelledby="download-title">
       <div className="mx-auto max-w-6xl">
-        <h2
-          id="download-title"
-          className="text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl"
-        >
-          Download the theme
-        </h2>
-        <p className="mt-3 max-w-2xl text-[var(--m3-on-surface-variant)]">
+        <SectionHeader eyebrow="Get the files" id="download-title" title={<>Download the theme</>}>
           Every file below is generated live on the server with your current
           seed color ({source}) and {mode} default scheme.
-        </p>
+        </SectionHeader>
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.1fr_1fr]">
           {/* Full package */}
@@ -66,7 +60,7 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
                 Download .tar.gz
               </M3ButtonLink>
               <span className="text-xs opacity-80">
-                ~7 MB · user-level install, no sudo
+                ~7&nbsp;MB · user-level install, no sudo
               </span>
             </div>
           </div>
@@ -102,7 +96,7 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
             {/* Zyntrix brand kit */}
             <a
               href="/zyntrix/"
-              className="group flex items-center gap-4 rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-5 transition-shadow hover:shadow-lg sm:col-span-2"
+              className="m3-card-interactive group flex items-center gap-4 rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-5 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-4 sm:col-span-2"
             >
               <img
                 src="/zyntrix/svg/zyntrix-z-small.svg"
@@ -120,7 +114,7 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
                   and the full favicon set.
                 </span>
               </span>
-              <span className="shrink-0 text-sm font-medium text-[var(--m3-primary)] group-hover:underline">
+              <span className="shrink-0 text-sm font-medium text-[var(--m3-primary)] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:underline">
                 Open showcase →
               </span>
             </a>
@@ -155,7 +149,7 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
                     href={`/wallpapers/${file}`}
                     download
                     aria-label={`Download ${meta.title} wallpaper`}
-                    className="rounded-full p-2.5 text-[var(--m3-primary)] transition-colors hover:bg-[var(--m3-secondary-container)]"
+                    className="rounded-full p-2.5 text-[var(--m3-primary)] transition-[background-color,transform] duration-200 hover:bg-[var(--m3-secondary-container)] active:scale-90 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
                   >
                     <FileArchive className="h-4 w-4" aria-hidden="true" />
                   </a>
@@ -186,7 +180,7 @@ function FileCard({
     <a
       href={direct ? href : `${href}${href.includes("?") ? "&" : "?"}download=1`}
       download
-      className="group flex flex-col rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-5 transition-shadow hover:shadow-lg"
+      className="m3-card-interactive group flex flex-col rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-5 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-4"
     >
       <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--m3-secondary-container)] text-[var(--m3-on-secondary-container)]">
         {icon}
@@ -195,7 +189,7 @@ function FileCard({
       <p className="mt-1 text-xs leading-relaxed text-[var(--m3-on-surface-variant)]">
         {desc}
       </p>
-      <span className="mt-3 text-sm font-medium text-[var(--m3-primary)] group-hover:underline">
+      <span className="mt-3 text-sm font-medium text-[var(--m3-primary)] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:underline">
         Download →
       </span>
     </a>

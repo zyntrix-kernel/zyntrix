@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type M3Variant = "filled" | "tonal" | "outlined" | "text" | "elevated";
@@ -45,6 +48,59 @@ export function M3ButtonLink({
   );
 }
 
+/** Scroll-triggered reveal wrapper (fade + rise, once) */
+export function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** Premium section header: eyebrow pill + display title + lead text */
+export function SectionHeader({
+  eyebrow,
+  title,
+  children,
+  id,
+}: {
+  eyebrow: string;
+  title: React.ReactNode;
+  children: React.ReactNode;
+  id?: string;
+}) {
+  return (
+    <Reveal>
+      <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--m3-primary)]">
+        {eyebrow}
+      </span>
+      <h2
+        id={id}
+        className="mt-4 text-balance text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]"
+      >
+        {title}
+      </h2>
+      <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--m3-on-surface-variant)] sm:text-lg">
+        {children}
+      </p>
+    </Reveal>
+  );
+}
+
 /** Material 3 switch (trailing icon style) */
 export function M3Switch({
   checked,
@@ -62,19 +118,22 @@ export function M3Switch({
       aria-checked={checked}
       aria-label={label}
       onClick={() => onCheckedChange(!checked)}
-      className={`relative h-8 w-[52px] shrink-0 rounded-full border-2 transition-colors duration-200 ${
+      className={`relative h-8 w-[52px] shrink-0 rounded-full border-2 transition-[background-color,border-color,box-shadow] duration-300 ${
         checked
-          ? "border-[var(--m3-primary)] bg-[var(--m3-primary)]"
+          ? "border-[var(--m3-primary)] bg-[var(--m3-primary)] shadow-[0_2px_10px_color-mix(in_srgb,var(--m3-primary)_45%,transparent)]"
           : "border-[var(--m3-outline)] bg-[var(--m3-surface-container-highest)]"
       }`}
     >
+      {/* Thumb glides on transform only — no left/width/height animation */}
       <span
-        className={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all duration-200 ${
+        className={`absolute left-1 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-full text-[10px] transition-[transform,background-color] duration-300 [transition-timing-function:var(--ease-spring)] ${
           checked
-            ? "left-[22px] h-6 w-6 bg-[var(--m3-on-primary)]"
-            : "left-1 h-4 w-4 bg-[var(--m3-outline)]"
+            ? "translate-x-[20px] bg-[var(--m3-on-primary)] text-[var(--m3-primary)]"
+            : "translate-x-0 scale-[0.667] bg-[var(--m3-outline)]"
         }`}
-      />
+      >
+        {checked && "✓"}
+      </span>
     </button>
   );
 }
@@ -99,16 +158,28 @@ export function M3Chip({
       aria-label={ariaLabel}
       aria-pressed={selected}
       onClick={onClick}
-      className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors ${
+      className={`inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-[background-color,border-color,color,box-shadow,transform] duration-200 hover:shadow-sm active:scale-95 ${
         selected
-          ? "border-transparent bg-[var(--m3-secondary-container)] text-[var(--m3-on-secondary-container)]"
+          ? "border-transparent bg-[var(--m3-secondary-container)] text-[var(--m3-on-secondary-container)] shadow-[inset_0_-1px_0_rgba(0,0,0,0.08)]"
           : "border-[var(--m3-outline)] text-[var(--m3-on-surface)] hover:bg-[var(--m3-surface-container)]"
       }`}
     >
       {selected ? (
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
-          <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
+        <motion.svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4"
+          fill="currentColor"
+          aria-hidden="true"
+          initial={false}
+          key="check"
+        >
+          <motion.path
+            d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          />
+        </motion.svg>
       ) : (
         icon
       )}
@@ -132,7 +203,7 @@ export function M3Fab({
   return (
     <button
       aria-label={label}
-      className={`inline-flex items-center justify-center gap-2 bg-[var(--m3-primary-container)] text-[var(--m3-on-primary-container)] shadow-lg transition-transform hover:scale-105 active:scale-95 ${
+      className={`inline-flex items-center justify-center gap-2 bg-[var(--m3-primary-container)] text-[var(--m3-on-primary-container)] shadow-lg transition-[transform,box-shadow] duration-300 [transition-timing-function:var(--ease-spring)] hover:scale-105 hover:shadow-2xl active:scale-95 ${
         extended ? "h-14 rounded-2xl px-5 text-base font-medium" : ""
       } ${
         size === "sm"

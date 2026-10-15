@@ -14,7 +14,7 @@ import {
   Volume2,
   Wifi,
 } from "lucide-react";
-import { M3Chip } from "./primitives";
+import { M3Chip, SectionHeader } from "./primitives";
 import type { M3Mode } from "@/lib/m3/theme";
 
 const WALLPAPERS = [
@@ -30,46 +30,45 @@ export function DesktopPreview({ mode }: { mode: M3Mode }) {
   // initializes the default wallpaper for the current mode.
   const [wall, setWall] = useState<WallId>(mode === "dark" ? "dark" : "light");
 
-  const wallpaper = WALLPAPERS.find((w) => w.id === wall) ?? WALLPAPERS[0];
-
   return (
-    <section id="preview" className="px-4 py-10 sm:py-14" aria-labelledby="preview-title">
+    <section id="preview" className="px-4 py-14 sm:py-20" aria-labelledby="preview-title">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2
-              id="preview-title"
-              className="text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl"
+        <SectionHeader
+          id="preview-title"
+          eyebrow="Live mock"
+          title={<>Live Plasma preview</>}
+        >
+          A faithful mock of Kubuntu with the generated theme applied —
+          top panel, Dolphin, Konsole and System Settings, all tinted from
+          your seed color.
+        </SectionHeader>
+
+        <div role="group" aria-label="Choose preview wallpaper" className="mt-6 flex gap-2">
+          {WALLPAPERS.map((w) => (
+            <M3Chip
+              key={w.id}
+              selected={wall === w.id}
+              onClick={() => setWall(w.id)}
+              ariaLabel={`Preview with ${w.label} wallpaper`}
             >
-              Live Plasma preview
-            </h2>
-            <p className="mt-3 max-w-2xl text-[var(--m3-on-surface-variant)]">
-              A faithful mock of Kubuntu with the generated theme applied —
-              top panel, Dolphin, Konsole and System Settings, all tinted from
-              your seed color.
-            </p>
-          </div>
-          <div className="flex gap-2" role="group" aria-label="Choose preview wallpaper">
-            {WALLPAPERS.map((w) => (
-              <M3Chip
-                key={w.id}
-                selected={wall === w.id}
-                onClick={() => setWall(w.id)}
-                ariaLabel={`Preview with ${w.label} wallpaper`}
-              >
-                {w.label}
-              </M3Chip>
-            ))}
-          </div>
+              {w.label}
+            </M3Chip>
+          ))}
         </div>
 
         <div className="relative mt-8 overflow-hidden rounded-[28px] shadow-2xl ring-1 ring-black/20">
-          {/* Wallpaper */}
-          <img
-            src={wallpaper.src}
-            alt={`Material 3 ${wallpaper.label} wallpaper`}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          {/* Wallpaper — all three stacked and preloaded, crossfaded via opacity */}
+          {WALLPAPERS.map((w) => (
+            <img
+              key={w.id}
+              src={w.src}
+              alt={`Material 3 ${w.label} wallpaper`}
+              aria-hidden={wall !== w.id ? true : undefined}
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 [transition-timing-function:var(--ease-enter)] ${
+                wall === w.id ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          ))}
 
           <div className="relative aspect-[16/11] sm:aspect-[16/9]">
             {/* ---- Top panel ---- */}
@@ -97,7 +96,7 @@ export function DesktopPreview({ mode }: { mode: M3Mode }) {
                 <Wifi className="h-3.5 w-3.5" aria-hidden="true" />
                 <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
                 <BatteryFull className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="rounded-md px-1.5 py-0.5 text-[11px] font-medium">
+                <span className="rounded-md px-1.5 py-0.5 text-[11px] font-medium tabular-nums">
                   10:24
                 </span>
               </span>
@@ -302,7 +301,7 @@ export function DesktopPreview({ mode }: { mode: M3Mode }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-3xl bg-[var(--m3-inverse-surface)] p-3 text-[var(--m3-inverse-on-surface)] shadow-xl">
-                  <span className="text-2xl font-light leading-none">10:24</span>
+                  <span className="text-2xl font-light leading-none tabular-nums">10:24</span>
                   <span className="text-[10px] leading-tight opacity-80">
                     Mon, May 12
                     <br />
@@ -343,9 +342,12 @@ function MockWindow({
         </span>
         {actions && (
           <span className="ml-auto flex items-center gap-2 text-[var(--m3-on-surface-variant)]" aria-hidden="true">
-            <span className="text-[10px] leading-none">–</span>
-            <span className="text-[8px] leading-none">□</span>
-            <span className="text-[10px] leading-none">×</span>
+            <span className="h-0.5 w-2.5 rounded-full bg-current opacity-70" />
+            <span className="h-2 w-2 rounded-[3px] border border-current opacity-70" />
+            <span className="relative flex h-3 w-3 items-center justify-center opacity-70">
+              <span className="absolute h-[1.5px] w-3 rotate-45 rounded-full bg-current" />
+              <span className="absolute h-[1.5px] w-3 -rotate-45 rounded-full bg-current" />
+            </span>
           </span>
         )}
       </div>

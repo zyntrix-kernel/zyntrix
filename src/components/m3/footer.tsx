@@ -2,7 +2,7 @@ import type { M3Mode } from "@/lib/m3/theme";
 
 export function Footer({ mode }: { mode: M3Mode }) {
   return (
-    <footer className="mt-auto bg-[var(--m3-surface-container)] pb-[env(safe-area-inset-bottom)]">
+    <footer className="mt-auto border-t border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container)] pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
         <div className="flex items-center gap-3">
           <img
@@ -37,7 +37,7 @@ export function Footer({ mode }: { mode: M3Mode }) {
               <li key={href}>
                 <a
                   href={href}
-                  className="rounded-full px-3 py-2 transition-colors hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)]"
+                  className="rounded-full px-3 py-2 transition-colors hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)] focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
                 >
                   {label}
                 </a>

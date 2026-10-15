@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -42,6 +42,11 @@ export const metadata: Metadata = {
     ],
     apple: "/zyntrix/web/apple-touch-icon.png",
   },
+};
+
+/* The studio defaults to a deep M3 dark surface; keep the browser chrome in sync */
+export const viewport: Viewport = {
+  themeColor: "#141218",
 };
 
 export default function RootLayout({

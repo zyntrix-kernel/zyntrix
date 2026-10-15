@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { M3Mode } from "@/lib/m3/theme";
+import { SectionHeader } from "./primitives";
 
 export function InstallGuide({ mode }: { mode: M3Mode }) {
   const scheme = mode === "dark" ? "M3KubuntuDark" : "M3KubuntuLight";
@@ -30,17 +31,11 @@ export function InstallGuide({ mode }: { mode: M3Mode }) {
   ];
 
   return (
-    <section id="install" className="px-4 py-10 sm:py-14" aria-labelledby="install-title">
+    <section id="install" className="px-4 py-14 sm:py-20" aria-labelledby="install-title">
       <div className="mx-auto max-w-6xl">
-        <h2
-          id="install-title"
-          className="text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl"
-        >
-          Installation guide
-        </h2>
-        <p className="mt-3 max-w-2xl text-[var(--m3-on-surface-variant)]">
+        <SectionHeader eyebrow="Setup" id="install-title" title={<>Installation guide</>}>
           Works on Kubuntu 22.04+ and any KDE Plasma 5.27 / Plasma 6 system.
-        </p>
+        </SectionHeader>
 
         <ol className="mt-8 space-y-4">
           {steps.map((step, i) => (
@@ -49,7 +44,7 @@ export function InstallGuide({ mode }: { mode: M3Mode }) {
               className="flex flex-col gap-4 rounded-[28px] bg-[var(--m3-surface-container-low)] p-5 sm:flex-row sm:items-start sm:p-6"
             >
               <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--m3-primary)] text-lg font-medium text-[var(--m3-on-primary)]"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--m3-primary)] text-lg font-medium tabular-nums text-[var(--m3-on-primary)]"
                 aria-hidden="true"
               >
                 {i + 1}
@@ -95,7 +90,7 @@ function CodeBlock({ code }: { code: string }) {
         type="button"
         onClick={copy}
         aria-label="Copy command"
-        className="absolute right-2 top-2 rounded-full p-2 text-[var(--m3-inverse-on-surface)] transition-colors hover:bg-white/10"
+        className="absolute right-2 top-2 rounded-full p-2 text-[var(--m3-inverse-on-surface)] transition-[background-color,transform] duration-200 hover:bg-white/10 active:scale-90 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
       >
         {copied ? (
           <Check className="h-4 w-4" aria-hidden="true" />

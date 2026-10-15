@@ -1,5 +1,9 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { Pipette } from "lucide-react";
 import { SEED_PRESETS, type M3Mode } from "@/lib/m3/theme";
+import { SectionHeader } from "./primitives";
 
 export function Customizer({
   source,
@@ -15,19 +19,17 @@ export function Customizer({
   roles: Record<string, string>;
 }) {
   return (
-    <section id="customize" className="px-4 py-10 sm:py-14" aria-labelledby="customize-title">
+    <section id="customize" className="px-4 py-14 sm:py-20" aria-labelledby="customize-title">
       <div className="mx-auto max-w-6xl">
-        <h2
+        <SectionHeader
+          eyebrow="Dynamic color"
           id="customize-title"
-          className="text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl"
+          title="Theme customizer"
         >
-          Theme customizer
-        </h2>
-        <p className="mt-3 max-w-2xl text-[var(--m3-on-surface-variant)]">
           Choose a seed color. Everything on this page — including the live
           Plasma preview and every generated file — re-tints instantly using
           the same Material color engine that powers Android &amp; ChromeOS.
-        </p>
+        </SectionHeader>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_auto]">
           <div className="rounded-[28px] bg-[var(--m3-surface-container-low)] p-6 sm:p-8">
@@ -44,18 +46,23 @@ export function Customizer({
                     onClick={() => onSourceChange(preset.hex)}
                     aria-pressed={selected}
                     aria-label={`Use ${preset.name} seed color`}
-                    className={`group flex flex-col items-center gap-2 rounded-2xl p-2 transition-transform hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] ${
+                    className={`group flex flex-col items-center gap-2 rounded-2xl p-2 transition-transform duration-200 [transition-timing-function:var(--ease-enter)] hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2 ${
                       selected ? "bg-[var(--m3-secondary-container)]" : ""
                     }`}
                   >
                     <span
-                      className={`block h-14 w-14 rounded-full shadow-md transition-shadow ${
-                        selected
-                          ? "ring-2 ring-[var(--m3-on-surface)] ring-offset-2 ring-offset-[var(--m3-surface-container-low)]"
-                          : ""
-                      }`}
+                      className="relative block h-14 w-14 rounded-full shadow-md"
                       style={{ background: preset.hex }}
-                    />
+                    >
+                      {selected && (
+                        <motion.span
+                          layoutId="seed-ring"
+                          className="absolute -inset-[5px] rounded-full ring-2 ring-[var(--m3-on-surface)]"
+                          transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
                     <span
                       className={`text-xs font-medium ${
                         selected
@@ -71,7 +78,7 @@ export function Customizer({
             </div>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <label className="flex items-center gap-4 rounded-full bg-[var(--m3-surface-container-highest)] py-2 pl-2 pr-5">
+              <label className="flex items-center gap-4 rounded-full bg-[var(--m3-surface-container-highest)] py-2 pl-2 pr-5 transition-[background-color] focus-within:ring-2 focus-within:ring-[var(--m3-primary)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--m3-surface-container-low)]">
                 <input
                   type="color"
                   value={source}
@@ -96,23 +103,34 @@ export function Customizer({
               <div
                 role="group"
                 aria-label="Color scheme mode"
-                className="flex h-12 rounded-full border border-[var(--m3-outline)] p-1"
+                className="relative flex h-12 rounded-full border border-[var(--m3-outline)] p-1"
               >
-                {(["light", "dark"] as M3Mode[]).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    aria-pressed={mode === m}
-                    onClick={() => onModeChange(m)}
-                    className={`h-full rounded-full px-5 text-sm font-medium capitalize transition-colors ${
-                      mode === m
-                        ? "bg-[var(--m3-primary)] text-[var(--m3-on-primary)]"
-                        : "text-[var(--m3-on-surface-variant)] hover:bg-[var(--m3-surface-container-highest)]"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
+                {(["light", "dark"] as M3Mode[]).map((m) => {
+                  const active = mode === m;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => onModeChange(m)}
+                      className={`relative h-full rounded-full px-5 text-sm font-medium capitalize transition-colors focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2 ${
+                        active
+                          ? "text-[var(--m3-on-primary)]"
+                          : "text-[var(--m3-on-surface-variant)] hover:bg-[var(--m3-surface-container-highest)]"
+                      }`}
+                    >
+                      {active && (
+                        <motion.span
+                          layoutId="mode-thumb"
+                          className="absolute inset-0 rounded-full bg-[var(--m3-primary)]"
+                          transition={{ type: "spring", stiffness: 480, damping: 40 }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <span className="relative z-10">{m}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -136,7 +154,7 @@ export function Customizer({
                       style={{ background: `var(--m3-${role})` }}
                     />
                     <span className="capitalize">{label}</span>
-                    <span className="ml-auto text-xs opacity-70">
+                    <span className="ml-auto font-mono text-xs opacity-70">
                       {roles[role]?.toUpperCase()}
                     </span>
                   </div>
