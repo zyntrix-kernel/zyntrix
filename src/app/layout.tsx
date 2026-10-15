@@ -16,10 +16,11 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "M³ Kubuntu — Material 3 Theme Studio for Kubuntu",
+  title: "Zyntrix — Material 3 Theme Studio for Kubuntu",
   description:
-    "Generate a complete Material You / Material 3 theme for Kubuntu (KDE Plasma): color schemes, wallpapers, Konsole schemes and an installer — all from a single source color.",
+    "Zyntrix generates a complete Material You / Material 3 theme for Kubuntu (KDE Plasma): color schemes, wallpapers, Konsole schemes and an installer — all from a single source color.",
   keywords: [
+    "Zyntrix",
     "Kubuntu",
     "KDE Plasma",
     "Material 3",
@@ -28,7 +29,19 @@ export const metadata: Metadata = {
     "color scheme",
     "dynamic color",
   ],
-  authors: [{ name: "M3 Theme Studio" }],
+  authors: [{ name: "Zyntrix" }],
+  icons: {
+    icon: [
+      { url: "/zyntrix/web/favicon.ico", sizes: "48x48" },
+      { url: "/zyntrix/web/favicon.svg", type: "image/svg+xml" },
+      {
+        url: "/zyntrix/web/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+    ],
+    apple: "/zyntrix/web/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

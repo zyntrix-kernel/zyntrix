@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { Download, Palette, Sparkles } from "lucide-react";
 import { M3ButtonLink } from "./primitives";
+import type { M3Mode } from "@/lib/m3/theme";
 
-export function Hero({ source }: { source: string }) {
+export function Hero({ source, mode }: { source: string; mode: M3Mode }) {
   return (
     <section className="px-4 pb-10 pt-14 sm:pb-16 sm:pt-20" aria-labelledby="hero-title">
       <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
@@ -13,7 +14,7 @@ export function Hero({ source }: { source: string }) {
         >
           <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[var(--m3-secondary-container)] px-3 text-sm font-medium text-[var(--m3-on-secondary-container)]">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Material You · Dynamic color
+            Zyntrix · Material You · Dynamic color
           </span>
 
           <h1
@@ -71,20 +72,35 @@ export function Hero({ source }: { source: string }) {
           <div className="absolute inset-x-8 bottom-0 top-10 rounded-[3.5rem] bg-[var(--m3-primary-container)] transition-colors duration-500" />
           <div className="absolute bottom-16 right-4 h-36 w-36 rounded-full bg-[var(--m3-tertiary-container)] transition-colors duration-500" />
           <div className="absolute left-2 top-2 h-24 w-24 rounded-full bg-[var(--m3-secondary-container)] transition-colors duration-500" />
-          <div className="absolute left-10 top-32 flex h-16 items-center gap-2 rounded-full bg-[var(--m3-inverse-surface)] px-5 text-[var(--m3-inverse-on-surface)] shadow-lg transition-colors duration-500">
+
+          {/* Zyntrix brand mark — centerpiece */}
+          <img
+            src="/zyntrix/svg/zyntrix-app-icon.svg"
+            alt="Zyntrix logo — gradient Z with orbit ring and spark"
+            width={192}
+            height={192}
+            className="absolute left-1/2 top-[9%] w-44 -translate-x-1/2 rounded-[2.25rem] shadow-2xl transition-transform duration-500 hover:scale-[1.03]"
+          />
+
+          {/* Horizontal lockup card */}
+          <div className="absolute bottom-6 right-1 rounded-3xl bg-[var(--m3-surface-container-highest)] px-5 py-4 shadow-xl transition-colors duration-500">
+            <img
+              src={
+                mode === "dark"
+                  ? "/zyntrix/svg/zyntrix-lockup-horizontal.svg"
+                  : "/zyntrix/svg/zyntrix-lockup-horizontal-light.svg"
+              }
+              alt="Zyntrix — Build · Configure · Explore"
+              className="h-12 w-auto sm:h-14"
+            />
+          </div>
+
+          <div className="absolute bottom-16 left-1 flex h-16 items-center gap-2 rounded-full bg-[var(--m3-inverse-surface)] px-5 text-[var(--m3-inverse-on-surface)] shadow-lg transition-colors duration-500">
             <span
-              className="h-5 w-5 rounded-full border-2 border-[var(--m3-inverse-on-surface)]"
+              className="h-5 w-5 shrink-0 rounded-full border-2 border-[var(--m3-inverse-on-surface)]"
               style={{ background: source }}
             />
             <span className="font-mono text-sm">{source}</span>
-          </div>
-          <div className="absolute bottom-24 left-16 rounded-3xl bg-[var(--m3-surface-container-highest)] px-6 py-5 shadow-xl transition-colors duration-500">
-            <p className="text-xs font-medium uppercase tracking-wider text-[var(--m3-primary)]">
-              Kubuntu 24.04
-            </p>
-            <p className="mt-1 text-lg font-medium text-[var(--m3-on-surface)]">
-              Plasma · M³ Theme
-            </p>
           </div>
         </motion.div>
       </div>

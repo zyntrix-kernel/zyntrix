@@ -79,12 +79,14 @@ export function DesktopPreview({ mode }: { mode: M3Mode }) {
                 background: "color-mix(in srgb, var(--m3-surface-container) 82%, transparent)",
               }}
             >
-              <span
+              <img
+                src="/zyntrix/svg/zyntrix-app-icon.svg"
+                alt=""
+                width={28}
+                height={28}
                 aria-hidden="true"
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--m3-primary)] text-[11px] font-bold text-[var(--m3-on-primary)]"
-              >
-                K
-              </span>
+                className="h-7 w-7 shrink-0"
+              />
               <span className="hidden rounded-full bg-[var(--m3-primary-container)] px-3 py-1 text-[11px] font-medium text-[var(--m3-on-primary-container)] sm:block">
                 Dolphin
               </span>

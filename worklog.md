@@ -49,3 +49,22 @@ Stage Summary:
 - Production SVG logo kit for Zyntrix complete: 11 master SVGs + web icon set; all vectors (no text/rasters/filters), identity survives 16 px.
 - Palette mapped to M3 roles: primary #AE49F8, primary-d #6B1AC9, container #C9AFFF, on-primary #E9DCFF, surface #06021D, spark #F4EEFF.
 - Regenerate anytime: python3 /home/z/my-project/zyntrix-logo/build_logo.py
+
+---
+Task ID: 3
+Agent: Z.ai Code (main)
+Task: Use the finished Zyntrix logo in the Next.js preview page (the M3 Kubuntu theme studio at /).
+
+Work Log:
+- Wired site branding to the logo kit in public/zyntrix: TopBar now shows the M3 squircle app icon + "Zyntrix / M³ for Kubuntu" two-line brand (aria-label "Zyntrix home").
+- Hero: added mode prop; badge reads "Zyntrix · Material You · Dynamic color"; right collage rebuilt — app icon as centerpiece (hover scale), mode-aware horizontal lockup card (dark variant in dark mode, light variant in light mode), seed chip moved bottom-left to avoid overlap.
+- DesktopPreview: mock Plasma top-panel kickoff "K" replaced with the Zyntrix app icon mark.
+- Footer: mode-aware symbol (symbol.svg dark / symbol-light.svg light), text rebranded to "Zyntrix — Material 3 Theme Studio for Kubuntu", added "Brand kit" nav item.
+- Downloads: added wide "Zyntrix brand kit" card (z-small mark) linking to /zyntrix/ showcase.
+- layout.tsx metadata: title/authors rebranded to Zyntrix, icons wired to /zyntrix/web favicon set (.ico, .svg, 192px PNG, apple-touch).
+- Fixed /zyntrix 404: added beforeFiles rewrites in next.config.ts (/zyntrix and /zyntrix/ -> /zyntrix/index.html) and <base href="/zyntrix/"> in the showcase HTML so its relative svg/web asset paths resolve at the clean URL.
+- QA via agent-browser: desktop + 390px mobile screenshots, light/dark lockup+symbol variant switching, Forest seed re-tint (logo stays legible on any seed), brand-kit click-through to /zyntrix showcase (renders fully), all 10 referenced asset URLs return 200, zero console/page errors, lint clean.
+
+Stage Summary:
+- Zyntrix logo is now the live brand of the preview page: TopBar, hero centerpiece, Plasma panel mark, footer, downloads card and favicon all use the kit; light/dark and seed-agnostic behavior verified in browser.
+- Static showcase reachable at /zyntrix (clean URL) via config rewrite + base-tag fix.

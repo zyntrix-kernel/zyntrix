@@ -1,17 +1,24 @@
-export function Footer() {
+import type { M3Mode } from "@/lib/m3/theme";
+
+export function Footer({ mode }: { mode: M3Mode }) {
   return (
     <footer className="mt-auto bg-[var(--m3-surface-container)] pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--m3-primary)] text-sm font-bold text-[var(--m3-on-primary)]"
-          >
-            M³
-          </span>
+          <img
+            src={
+              mode === "dark"
+                ? "/zyntrix/svg/zyntrix-symbol.svg"
+                : "/zyntrix/svg/zyntrix-symbol-light.svg"
+            }
+            alt="Zyntrix logo"
+            width={40}
+            height={40}
+            className="h-10 w-10 shrink-0"
+          />
           <div>
             <p className="text-sm font-medium text-[var(--m3-on-surface)]">
-              M³ Kubuntu — Material 3 Theme Studio
+              Zyntrix — Material 3 Theme Studio for Kubuntu
             </p>
             <p className="text-xs text-[var(--m3-on-surface-variant)]">
               Not affiliated with Google or Canonical. Colors via the Apache-2.0
@@ -25,6 +32,7 @@ export function Footer() {
               ["#preview", "Preview"],
               ["#download", "Download"],
               ["#install", "Install"],
+              ["/zyntrix/", "Brand kit"],
             ].map(([href, label]) => (
               <li key={href}>
                 <a

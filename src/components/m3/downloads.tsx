@@ -98,6 +98,32 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
               href={WALLPAPER_FILES[mode === "dark" ? 1 : 0]}
               direct
             />
+
+            {/* Zyntrix brand kit */}
+            <a
+              href="/zyntrix/"
+              className="group flex items-center gap-4 rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-5 transition-shadow hover:shadow-lg sm:col-span-2"
+            >
+              <img
+                src="/zyntrix/svg/zyntrix-z-small.svg"
+                alt="Zyntrix logo mark"
+                width={40}
+                height={40}
+                className="h-10 w-10 shrink-0"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium text-[var(--m3-on-surface)]">
+                  Zyntrix brand kit
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-[var(--m3-on-surface-variant)]">
+                  The logo behind this site — SVG symbol, lockups, M3 app icon
+                  and the full favicon set.
+                </span>
+              </span>
+              <span className="shrink-0 text-sm font-medium text-[var(--m3-primary)] group-hover:underline">
+                Open showcase →
+              </span>
+            </a>
           </div>
         </div>
 

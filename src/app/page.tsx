@@ -43,7 +43,7 @@ export default function Home() {
       <TopBar mode={mode} onToggleMode={() => setMode(mode === "dark" ? "light" : "dark")} />
 
       <main className="flex-1">
-        <Hero source={source} />
+        <Hero source={source} mode={mode} />
         <Customizer
           source={source}
           onSourceChange={setSource}
@@ -58,7 +58,7 @@ export default function Home() {
         <InstallGuide mode={mode} />
       </main>
 
-      <Footer />
+      <Footer mode={mode} />
     </div>
   );
 }

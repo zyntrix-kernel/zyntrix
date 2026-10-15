@@ -26,16 +26,23 @@ export function TopBar({
         <a
           href="#top"
           className="flex items-center gap-2.5 rounded-full py-1 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)]"
-          aria-label="M3 Kubuntu home"
+          aria-label="Zyntrix home"
         >
-          <span
+          <img
+            src="/zyntrix/svg/zyntrix-app-icon.svg"
+            alt=""
+            width={36}
+            height={36}
+            className="h-9 w-9 shrink-0 drop-shadow-sm"
             aria-hidden="true"
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--m3-primary)] text-sm font-bold text-[var(--m3-on-primary)]"
-          >
-            M³
-          </span>
-          <span className="hidden text-lg font-medium text-[var(--m3-on-surface)] sm:block">
-            M³ Kubuntu
+          />
+          <span className="hidden leading-tight sm:block">
+            <span className="block text-base font-medium text-[var(--m3-on-surface)]">
+              Zyntrix
+            </span>
+            <span className="block text-[11px] text-[var(--m3-on-surface-variant)]">
+              M³ for Kubuntu
+            </span>
           </span>
         </a>
 
