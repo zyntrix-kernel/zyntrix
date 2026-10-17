@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Pipette } from "lucide-react";
 import { SEED_PRESETS, type M3Mode } from "@/lib/m3/theme";
-import { SectionHeader } from "./primitives";
+import { Reveal, SectionHeader } from "./primitives";
 
 export function Customizer({
   source,
@@ -32,7 +32,8 @@ export function Customizer({
         </SectionHeader>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_auto]">
-          <div className="rounded-[28px] bg-[var(--m3-surface-container-low)] p-6 sm:p-8">
+          <Reveal>
+          <div className="h-full rounded-[28px] bg-[var(--m3-surface-container-low)] p-6 sm:p-8">
             <p className="text-sm font-medium uppercase tracking-wider text-[var(--m3-primary)]">
               Seed presets
             </p>
@@ -51,8 +52,11 @@ export function Customizer({
                     }`}
                   >
                     <span
-                      className="relative block h-14 w-14 rounded-full shadow-md"
-                      style={{ background: preset.hex }}
+                      className="relative block h-14 w-14 rounded-full shadow-md transition-shadow duration-300 group-hover:shadow-[0_6px_26px_var(--swatch-glow)]"
+                      style={{
+                        background: preset.hex,
+                        ["--swatch-glow" as string]: `color-mix(in srgb, ${preset.hex} 55%, transparent)`,
+                      }}
                     >
                       {selected && (
                         <motion.span
@@ -134,8 +138,10 @@ export function Customizer({
               </div>
             </div>
           </div>
+          </Reveal>
 
-          <div className="flex flex-col justify-between gap-4 rounded-[28px] bg-[var(--m3-primary-container)] p-6 text-[var(--m3-on-primary-container)] sm:p-8 lg:w-72">
+          <Reveal delay={0.08}>
+          <div className="flex h-full flex-col justify-between gap-4 rounded-[28px] bg-[var(--m3-primary-container)] p-6 text-[var(--m3-on-primary-container)] sm:p-8 lg:w-72">
             <div>
               <p className="text-sm font-medium uppercase tracking-wider opacity-80">
                 Key roles
@@ -166,6 +172,7 @@ export function Customizer({
               contrast — the heart of Material You.
             </p>
           </div>
+          </Reveal>
         </div>
       </div>
     </section>

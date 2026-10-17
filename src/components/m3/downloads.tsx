@@ -5,7 +5,7 @@ import {
   Package,
   Terminal,
 } from "lucide-react";
-import { M3ButtonLink, SectionHeader } from "./primitives";
+import { M3ButtonLink, Reveal, SectionHeader } from "./primitives";
 import { WALLPAPER_FILES } from "@/lib/m3/theme";
 import type { M3Mode } from "@/lib/m3/theme";
 
@@ -37,7 +37,8 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
 
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.1fr_1fr]">
           {/* Full package */}
-          <div className="flex flex-col justify-between rounded-[28px] bg-[var(--m3-primary-container)] p-6 text-[var(--m3-on-primary-container)] sm:p-8">
+          <Reveal className="h-full">
+          <div className="flex h-full flex-col justify-between rounded-[28px] bg-[var(--m3-primary-container)] p-6 text-[var(--m3-on-primary-container)] shadow-[0_16px_50px_-18px_color-mix(in_srgb,var(--m3-primary)_35%,transparent)] sm:p-8">
             <div>
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--m3-primary)] text-[var(--m3-on-primary)]">
                 <Package className="h-7 w-7" aria-hidden="true" />
@@ -64,9 +65,11 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
               </span>
             </div>
           </div>
+          </Reveal>
 
           {/* Individual files */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          <Reveal delay={0.08} className="h-full">
+          <div className="grid h-full gap-4 sm:grid-cols-2">
             <FileCard
               icon={<FileCode2 className="h-5 w-5" aria-hidden="true" />}
               title="KDE color scheme"
@@ -119,9 +122,11 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
               </span>
             </a>
           </div>
+          </Reveal>
         </div>
 
         {/* Wallpaper gallery */}
+        <Reveal delay={0.1}>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           {WALLPAPER_FILES.map((file) => {
             const meta = WALLPAPER_LABELS[file];
@@ -158,6 +163,7 @@ export function Downloads({ source, mode }: { source: string; mode: M3Mode }) {
             );
           })}
         </div>
+        </Reveal>
       </div>
     </section>
   );

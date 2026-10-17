@@ -1,4 +1,9 @@
-import { CanvasTexture, SRGBColorSpace, LinearFilter } from "three";
+import {
+  CanvasTexture,
+  SRGBColorSpace,
+  LinearFilter,
+  RepeatWrapping,
+} from "three";
 import { toneToHex, type M3Scheme } from "@/lib/m3/theme";
 
 /**
@@ -349,4 +354,77 @@ export function makeScreenGradientTexture(
   };
   redraw(scheme);
   return { canvas, texture, redraw };
+}
+
+/* ------------------------------------------------------------------ */
+/*  The runway — machined guide inlay running the whole corridor       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Draws one repeatable segment of the runway inlay: a center guide line,
+ * twin edge rails, direction chevrons and cross ticks. Tiled along −Z by a
+ * plane 3.2 wide × 760 long. Used as BOTH map and emissiveMap so the inlay
+ * is a real (subtle) light source — the bloom pass gives it life without
+ * the old "laser beam through every shot" artifact.
+ */
+export function buildRunwayTexture(): CanvasTexture {
+  const W = 512;
+  const H = 1024; /* one tile = 8 world units of length (plane scale) */
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext("2d")!;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const line = (x: number, w: number, alpha: number) => {
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fillRect(x - w / 2, 0, w, H);
+  };
+
+  /* center guide + edge rails */
+  line(W * 0.5, 3, 0.85);
+  line(W * 0.12, 2, 0.4);
+  line(W * 0.88, 2, 0.4);
+
+  /* dashed outer rails */
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  for (let y = 0; y < H; y += 64) {
+    ctx.fillRect(W * 0.045 - 1, y, 2, 34);
+    ctx.fillRect(W * 0.955 - 1, y, 2, 34);
+  }
+
+  /* direction chevrons pointing down the journey (−Z = canvas up) */
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  for (let y = H - 90; y > 0; y -= 256) {
+    ctx.beginPath();
+    ctx.moveTo(W * 0.42, y + 26);
+    ctx.lineTo(W * 0.5, y);
+    ctx.lineTo(W * 0.58, y + 26);
+    ctx.stroke();
+  }
+
+  /* measurement ticks + faint node dots */
+  for (let y = 0; y < H; y += 128) {
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fillRect(W * 0.5 - 7, y, 14, 2);
+    ctx.beginPath();
+    ctx.arc(W * 0.12, y + 64, 2.2, 0, Math.PI * 2);
+    ctx.arc(W * 0.88, y + 64, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  /* faint machining noise so the strip never reads as vector-clean */
+  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  for (let i = 0; i < 240; i++) {
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+  }
+
+  const tex = new CanvasTexture(c);
+  tex.colorSpace = SRGBColorSpace;
+  tex.wrapS = tex.wrapT = RepeatWrapping;
+  tex.anisotropy = 4;
+  return tex;
 }

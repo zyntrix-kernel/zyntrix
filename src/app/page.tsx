@@ -129,6 +129,30 @@ export default function Home() {
 
           {/* SEQUENCE 09 — the working studio, opaque over the film */}
           <div className="relative z-10 bg-[var(--m3-surface)] shadow-[0_-24px_60px_rgba(0,0,0,0.35)]">
+            {/* studio aurora — theme-derived radial washes + film grain give the
+               working sections the same air as the film they follow */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 overflow-hidden"
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(52rem 34rem at 12% -2%, color-mix(in srgb, var(--m3-primary) 9%, transparent), transparent 62%)," +
+                    "radial-gradient(46rem 30rem at 96% 22%, color-mix(in srgb, var(--m3-tertiary) 7%, transparent), transparent 58%)," +
+                    "radial-gradient(60rem 40rem at 50% 108%, color-mix(in srgb, var(--m3-primary) 5%, transparent), transparent 60%)",
+                }}
+              />
+              <div
+                className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
+                style={{
+                  backgroundImage:
+                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3\")",
+                }}
+              />
+            </div>
+
             <Customizer
               source={source}
               onSourceChange={handleSourceChange}

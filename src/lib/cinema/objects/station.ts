@@ -65,7 +65,7 @@ export function buildWorkstation(binder: ThemeBinder): StationRig {
   const panel = new Mesh(new RoundedBoxGeometry(8.6, 5.4, 0.3, 4, 0.12), polymer);
   display.add(panel);
   const { texture: screenTex, redraw: redrawScreen } = makeScreenGradientTexture(binder.current, true);
-  const screenMat = emissiveRole(binder, () => "#ffffff", 1.25);
+  const screenMat = emissiveRole(binder, () => "#ffffff", 0.8);
   screenMat.map = screenTex;
   screenMat.emissiveMap = screenTex;
   screenMat.emissive.set("#ffffff");

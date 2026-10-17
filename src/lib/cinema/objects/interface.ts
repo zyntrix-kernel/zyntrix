@@ -34,7 +34,7 @@ export function buildInterface(binder: ThemeBinder): InterfaceRig {
   /* wallpaper layer (emissive gradient from the real roles) */
   const wall = new Group();
   const { texture: wallTex, redraw: redrawWall } = makeScreenGradientTexture(binder.current, false);
-  const wallMat = emissiveRole(binder, () => "#ffffff", 1.0);
+  const wallMat = emissiveRole(binder, () => "#ffffff", 0.8);
   wallMat.map = wallTex;
   wallMat.emissiveMap = wallTex;
   wallMat.emissive.set("#ffffff");

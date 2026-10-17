@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type M3Variant = "filled" | "tonal" | "outlined" | "text" | "elevated";
@@ -64,12 +64,51 @@ export function Reveal({
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: 0.7,
+        delay,
+        ease: [0.19, 1, 0.22, 1], // ease-out-expo — enters like film, not slide decks
+      }}
     >
       {children}
     </motion.div>
   );
 }
+
+/* Shared choreography for SectionHeader — a staggered entrance where the
+   eyebrow pops, the title rises, a gradient hairline draws itself, then the
+   lead settles. One variants tree; children opt in via `item`. */
+const headerContainer: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.075, delayChildren: 0.02 },
+  },
+};
+const headerItem: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.19, 1, 0.22, 1] },
+  },
+};
+const headerEyebrow: Variants = {
+  hidden: { opacity: 0, y: 22, scale: 0.92 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 380, damping: 26 },
+  },
+};
+const headerRule: Variants = {
+  hidden: { scaleX: 0, opacity: 0 },
+  show: {
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: 0.8, delay: 0.28, ease: [0.19, 1, 0.22, 1] },
+  },
+};
 
 /** Premium section header: eyebrow pill + display title + lead text */
 export function SectionHeader({
@@ -84,20 +123,38 @@ export function SectionHeader({
   id?: string;
 }) {
   return (
-    <Reveal>
-      <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--m3-primary)]">
+    <motion.div
+      variants={headerContainer}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-70px" }}
+    >
+      <motion.span
+        variants={headerEyebrow}
+        className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container)] px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--m3-primary)]"
+      >
         {eyebrow}
-      </span>
-      <h2
+      </motion.span>
+      <motion.h2
         id={id}
+        variants={headerItem}
         className="mt-4 text-balance text-3xl font-medium tracking-tight text-[var(--m3-on-surface)] sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]"
       >
         {title}
-      </h2>
-      <p className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--m3-on-surface-variant)] sm:text-lg">
+      </motion.h2>
+      {/* gradient hairline — the brand rule that stitches every section */}
+      <motion.span
+        variants={headerRule}
+        aria-hidden="true"
+        className="mt-4 block h-[2px] w-16 origin-left rounded-full bg-gradient-to-r from-[var(--m3-primary)] via-[var(--m3-tertiary)] to-transparent"
+      />
+      <motion.p
+        variants={headerItem}
+        className="mt-3 max-w-2xl text-base leading-relaxed text-[var(--m3-on-surface-variant)] sm:text-lg"
+      >
         {children}
-      </p>
-    </Reveal>
+      </motion.p>
+    </motion.div>
   );
 }
 

@@ -234,7 +234,7 @@ export function buildLaptop(binder: ThemeBinder): LaptopRig {
 
       // screen wakes after reassembly
       const wake = Math.max(0, (local - 0.86) / 0.14);
-      lidMat.emissiveIntensity = ease(Math.min(1, wake)) * 1.3;
+      lidMat.emissiveIntensity = ease(Math.min(1, wake)) * 0.8;
     },
     setScheme() {
       redrawLid(binder.current);

@@ -50,8 +50,10 @@ export class ThemeBinder {
 
   /** atmosphere targets, damped like everything else */
   readonly backgroundColor = new Color("#0b0910");
-  readonly fogColor = new Color("#0b0910");
-  readonly fog = new Fog(this.fogColor, 30, 190);
+  readonly fog = new Fog(new Color("#0b0910"), 30, 190);
+  /** live alias — Fog copies its constructor color, so this must point at
+   *  fog.color itself for the per-frame sync to reach the actual fog */
+  readonly fogColor: Color = this.fog.color;
   private bgTarget = new Color("#0b0910");
 
   constructor(source: string, mode: M3Mode) {
@@ -108,8 +110,8 @@ export class ThemeBinder {
     const base = new Color(this.scheme.roles[dark ? "surfaceDim" : "surfaceBright"]);
     const deep = base.clone().multiplyScalar(dark ? 0.42 : 0.86);
     this.bgTarget.copy(deep);
-    this.fog.near = dark ? 26 : 40;
-    this.fog.far = dark ? 170 : 230;
+    this.fog.near = dark ? 26 : 34;
+    this.fog.far = dark ? 170 : 175;
   }
 
   /** Jump every owner straight to its target (used at construction). */

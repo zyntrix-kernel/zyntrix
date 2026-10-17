@@ -55,10 +55,12 @@ export function buildDesktopStage(binder: ThemeBinder): StageRig {
 
   const screen = new Mesh(
     new PlaneGeometry(8.9, 5.4),
-    emissiveRole(binder, () => "#ffffff", 1.35)
+    emissiveRole(binder, () => "#ffffff", 0.8)
   );
   (screen.material as MeshStandardMaterial).map = desktop.texture;
-  (screen.material as MeshStandardMaterial).color.set("#ffffff");
+  /* display = pure emissive; black diffuse keeps spill lights from pushing
+     it over the bloom threshold */
+  (screen.material as MeshStandardMaterial).color.set("#050507");
   (screen.material as MeshStandardMaterial).emissiveMap = desktop.texture;
   (screen.material as MeshStandardMaterial).emissive.set("#ffffff");
   (screen.material as MeshStandardMaterial).needsUpdate = true;
@@ -134,10 +136,10 @@ export function buildDesktopStage(binder: ThemeBinder): StageRig {
       displayRoot.rotation.x = (1 - drop) * 0.18;
       stand.position.y = (1 - lift) * -3.2;
 
-      const emissive = wake * 1.35;
+      const emissive = wake * 0.8;
       const sm = screen.material as MeshStandardMaterial;
       sm.emissiveIntensity = emissive;
-      spill.material.opacity = 0.5 * wake;
+      spill.material.opacity = 0.14 * wake;
       screenLight.intensity = wake * 9 + (desktopBeat > 0.3 ? 2 : 0);
 
       /* Sequence 05 — camera handled by the rail; here the screen beats */

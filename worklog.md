@@ -169,3 +169,26 @@ Work Log:
 Stage Summary:
 - The page is now a continuous nine-chapter interactive software film (IGNITION → REVEAL) that lands in the fully functional studio; every world color derives from the real HCT engine; all motion is a pure function of scroll progress (scrub-safe both directions); reduced-motion/no-WebGL visitors get a designed static poster with live controls; the HOT/DISPLAY anti-lag architecture and all product features survive untouched.
 - Known headless-verification artifacts (not user-facing): rAF throttling in the sandbox slows progress smoothing convergence during screenshots; real-browser convergence ≈ 0.4s. Poster path is code-reviewed but could not be live-emulated (no reduced-motion emulation in the harness).
+
+---
+Task ID: grade
+Agent: Z.ai Code (main)
+Task: "Install the best motion and 3D skills to maximise potential — it looks basic" → skill install + full cinema-grade & studio-motion upgrade
+
+Work Log:
+- Installed 8 ClawHub motion/3D skills (shadertoy, cinematic-scroll, web-animation-design, 3d-web-experience, build-webgl-liquid-glass, webgl-perf-debug, hyperframes-animation, motion-graphics); distilled doctrine: ease-out entrances, transform+opacity only, motion values for gestures, every beat needs readable→transform→hold→exit, reduced-motion keeps opacity kills transforms.
+- Browser audit confirmed "basic": flat matte emblem, void floors, a 700-unit emissive "spine" box streaking through every shot like a laser, zero atmosphere, zero post-processing, static studio sections.
+- NEW src/lib/cinema/post.ts — authored post pipeline: EffectComposer → RenderPass → UnrealBloomPass (0.34/0.62/0.85) → OutputPass (ACES+sRGB) → GradePass (one authored GLSL pass: lens vignette, luminance-weighted animated film grain, edge-only chromatic aberration, contrast pivot). Mode-aware mood damping (dark: 0.34/0.85; light: 0.18/0.93). Full dispose; DPR-governor aware; guarded fallback to direct render.
+- NEW src/lib/cinema/atmosphere.ts — 1200 GPU dust motes (static buffers, all motion in vertex shader from uTime+seed, zero per-frame uploads, near/far/height fades, theme-tinted additive) + 6 authored SpotLight pools at the stations + additive floor-pool sprites bound to the binder.
+- textures.ts: buildRunwayTexture (canvas: center guide, edge rails, chevrons, measurement ticks, machining noise) as map+emissiveMap on a 3.2×760 inlay strip — replaces the spine laser-beam artifact.
+- world.ts: spine removed; runway added; atmosphere wired; EXPOSURE rail added (exposureAt(journey) — filmic light meter, pure f(progress)); floor widened 150→400 (kills horizon slivers).
+- engine.ts: composer render path, resize/governor/dispose wiring, per-frame exposure, post.setMood on theme change, clock.elapsed for grain.
+- emblem.ts: MeshPhysicalMaterial clearcoat Z, emissive ring inlay (the bloom halo), authored key SpotLight with wake choreography.
+- Blowout forensics: screen whites (emissive 1.35/1.3/1.25/1.0 + white diffuse + additive spill) crossed the bloom threshold → capped all screens to 0.8 pure-emissive (black diffuse), spill 0.14; blowout gone in both modes.
+- REAL BUG (light-mode black horizon band): three's Fog constructor COPIES its color — binder.fogColor was disconnected from scene.fog.color, so fog stayed construction-time dark navy forever; dark mode masked it (dark≈dark), light mode painted the far floor black. Fixed: fogColor now aliases fog.color; light fog near/far retuned (34/175).
+- Studio motion: SectionHeader choreography v2 (eyebrow spring-pop, title rise, gradient hairline self-draw, lead settle — one variants tree, stagger 75ms); Reveal upgraded to ease-out-expo 0.7s; customizer cards + swatches (theme-glow hover shadow via --swatch-glow color-mix); downloads cards/wallpapers revealed with primary glow shadow on the package card; studio aurora backdrop (theme radial washes + SVG noise overlay) in page.tsx.
+- Verified in real browser: ignition/world/field/chamber/desktop/product-film/hardware/interface/reveal all render cinematic; bloom halos correct; no blowouts in dark OR light; black horizon band eliminated; mobile 390px composes; P0 regressions PASS (html.dark + lab(2.75) first paint; drag scrollY frozen 8807→8807 with exact +40px commit); lint clean; zero console/page errors on fresh load.
+
+Stage Summary:
+- The page no longer looks basic: it now has a film grade (bloom/grain/vignette/CA), living air (GPU dust), authored light pools, a machined runway stitching all 9 chapters, a clear-coated haloed emblem, per-chapter exposure choreography, and a studio whose headers/cards/controls move with the same motion language. All new motion is a pure function of (journey, dt) except ambient dust/grain; HOT/DISPLAY architecture, drag pipeline, dark-from-start, and all product features untouched.
+- Found+fixed a latent real bug (fog color never bound) that would have broken light mode forever.

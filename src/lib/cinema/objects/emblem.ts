@@ -3,13 +3,14 @@ import {
   ExtrudeGeometry,
   Group,
   Mesh,
-  MeshStandardMaterial,
+  MeshPhysicalMaterial,
   Shape,
   TorusGeometry,
   CylinderGeometry,
   BoxGeometry,
   Object3D,
   PointLight,
+  SpotLight,
 } from "three";
 import { emissiveRole, machinedMetal, ThemeBinder, mixRoles } from "../palette";
 
@@ -68,6 +69,16 @@ export function buildEmblem(binder: ThemeBinder): EmblemRig {
   ring.position.y = 0.05;
   group.add(ring);
 
+  /* emissive ring inlay — a hairline of light riding the engraved groove;
+     the bloom pass turns this into the emblem's signature halo */
+  const inlay = new Mesh(
+    new TorusGeometry(2.02, 0.02, 12, 128),
+    emissiveRole(binder, (s) => s.roles.primary, 2.1)
+  );
+  inlay.rotation.x = Math.PI / 2;
+  inlay.position.y = 0.13;
+  group.add(inlay);
+
   /* machining tick marks around the ring */
   const tickGeo = new BoxGeometry(0.05, 0.05, 0.16);
   const tickMat = machinedMetal(binder);
@@ -81,7 +92,9 @@ export function buildEmblem(binder: ThemeBinder): EmblemRig {
   }
   group.add(ticks);
 
-  /* the Z mark — theme-tinted brushed metal */
+  /* the Z mark — theme-tinted clear-coated machined metal. The clearcoat
+     gives the flat faces a specular sweep as the turntable turns, which is
+     what separates "3D print" from "machined part". */
   const zGeo: BufferGeometry = new ExtrudeGeometry(zShape(), {
     depth: 0.34,
     bevelEnabled: true,
@@ -92,7 +105,13 @@ export function buildEmblem(binder: ThemeBinder): EmblemRig {
   });
   zGeo.center();
   const zMat = binder.material(
-    new MeshStandardMaterial({ metalness: 0.85, roughness: 0.28, envMapIntensity: 1.1 }),
+    new MeshPhysicalMaterial({
+      metalness: 0.86,
+      roughness: 0.22,
+      clearcoat: 0.55,
+      clearcoatRoughness: 0.28,
+      envMapIntensity: 1.3,
+    }),
     mixRoles("primary", "onPrimary", 0.18)
   );
   const z = new Mesh(zGeo, zMat);
@@ -115,15 +134,28 @@ export function buildEmblem(binder: ThemeBinder): EmblemRig {
   binder.color(ember.color, (s) => s.roles.primary);
   group.add(ember);
 
+  /* authored key spot — the modeling light that carves the Z out of the
+     dark; its wake choreography mirrors the ember */
+  const key = new SpotLight(0xffffff, 0, 26, 0.5, 0.85, 1.4);
+  key.position.set(2.6, 6.4, 4.6);
+  const keyTarget = new Object3D();
+  keyTarget.position.set(0, 1.2, 0);
+  group.add(keyTarget);
+  key.target = keyTarget;
+  binder.color(key.color, (s) => mixRoles("onSurface", "primary", 0.15)(s));
+  group.add(key);
+
   return {
     group,
     update(local, enterLocal) {
       // local: IGNITION progress 0..1 ; enterLocal: ENTER THE WORLD 0..1
       const wake = Math.min(1, local * 1.6);
       ember.intensity = 2.2 * wake + 2.4 * Math.max(0, enterLocal - 0.2);
+      key.intensity = 60 * wake + 40 * Math.max(0, enterLocal - 0.2);
       // subtle turntable: face the camera at rest, present the profile on exit
       z.rotation.y = (1 - wake) * -0.18 + local * 0.3 + enterLocal * 0.5;
       core.scale.setScalar(0.6 + 0.4 * wake);
+      inlay.rotation.z = local * 0.4 + enterLocal * 0.9;
       // the whole emblem rotates a touch as the world opens up
       group.rotation.y = enterLocal * 0.6;
     },

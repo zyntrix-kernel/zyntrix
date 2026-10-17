@@ -11,7 +11,8 @@ import {
   WebGLRenderer,
 } from "three";
 import { ThemeBinder } from "./palette";
-import { World, chapterAt, type ChapterId } from "./world";
+import { World, chapterAt, exposureAt, type ChapterId } from "./world";
+import { createPostPipeline, type PostPipeline } from "./post";
 import { buildScheme, type M3Mode } from "@/lib/m3/theme";
 
 /**
@@ -43,8 +44,9 @@ export class FilmEngine {
   private camera: PerspectiveCamera;
   private binder: ThemeBinder;
   private world: World;
+  private post: PostPipeline | null = null;
   private pmrem: PMREMGenerator | null = null;
-  private clock = { last: 0 };
+  private clock = { last: 0, elapsed: 0 };
   private raf = 0;
   private running = false;
   private disposed = false;
@@ -98,6 +100,16 @@ export class FilmEngine {
     scene.fog = this.binder.fog;
     scene.add(this.camera);
 
+    /* the film grade — bloom + authored grade pass; an enhancement, never
+       a requirement (pipeline creation guarded, rendering falls back) */
+    try {
+      this.post = createPostPipeline(this.renderer, scene, this.camera);
+      this.post.setPixelRatio(this.dprCap);
+      this.post.setMood(opts.mode === "dark");
+    } catch {
+      this.post = null;
+    }
+
     canvas.addEventListener("webglcontextlost", this.onContextLost);
     this.resize();
     window.addEventListener("resize", this.resize, { passive: true });
@@ -113,6 +125,7 @@ export class FilmEngine {
   setTheme(source: string, mode: M3Mode): void {
     this.binder.setTheme(source, mode);
     this.world.setScheme(this.binder.current);
+    this.post?.setMood(mode === "dark");
   }
 
   start(): void {
@@ -134,6 +147,7 @@ export class FilmEngine {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h, false);
+    this.post?.setSize(w, h);
   };
 
   dispose(): void {
@@ -142,6 +156,8 @@ export class FilmEngine {
     window.removeEventListener("resize", this.resize);
     this.canvas.removeEventListener("webglcontextlost", this.onContextLost);
     this.pmrem?.dispose();
+    this.post?.dispose();
+    this.post = null;
     this.world.root.traverse((obj) => {
       const mesh = obj as unknown as {
         geometry?: { dispose(): void };
@@ -170,6 +186,7 @@ export class FilmEngine {
     const now = performance.now();
     const dt = Math.min((now - this.clock.last) / 1000, 0.05);
     this.clock.last = now;
+    this.clock.elapsed += dt;
 
     /* filmic settle on the journey input; direct under reduced motion */
     this.smoothed = this.reducedMotion
@@ -188,7 +205,16 @@ export class FilmEngine {
 
     this.world.update(this.smoothed, dt);
     this.binder.update(dt);
-    this.renderer.render(this.world.root, this.camera);
+
+    /* exposure = filmic light meter, pure f(journey) */
+    this.renderer.toneMappingExposure = exposureAt(this.smoothed);
+
+    if (this.post) {
+      this.post.update(this.clock.elapsed, dt);
+      this.post.composer.render();
+    } else {
+      this.renderer.render(this.world.root, this.camera);
+    }
 
     /* chapter notification (coarse — React re-renders only at boundaries) */
     const ch = chapterAt(this.smoothed);
@@ -210,6 +236,8 @@ export class FilmEngine {
       this.dprStage++;
       const dpr = this.dprStage === 1 ? Math.min(1.25, this.dprCap) : 1;
       this.renderer.setPixelRatio(dpr);
+      this.post?.setPixelRatio(dpr);
+      this.world.setPixelRatio(dpr);
       this.frames = 0;
     }
   }

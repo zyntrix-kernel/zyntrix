@@ -1,5 +1,4 @@
 import {
-  BoxGeometry,
   DirectionalLight,
   Group,
   HemisphereLight,
@@ -8,9 +7,11 @@ import {
   PlaneGeometry,
   Scene,
 } from "three";
-import { ThemeBinder, emissiveRole } from "./palette";
+import { ThemeBinder, mixRoles } from "./palette";
 import { CameraRail, type RailKey } from "./rail";
 import { toneToHex } from "@/lib/m3/theme";
+import { buildRunwayTexture } from "./textures";
+import { buildAtmosphere, type AtmosphereRig } from "./atmosphere";
 import { buildEmblem, type EmblemRig } from "./objects/emblem";
 import { buildThemeField, type FieldRig } from "./objects/field";
 import { buildChamber, type ChamberRig } from "./objects/chamber";
@@ -84,15 +85,49 @@ interface ActiveRig {
   update(journey: number, dt: number): void;
 }
 
+/**
+ * Exposure rail — a filmic light meter, pure f(journey). Ignition opens in
+ * near-darkness, the world opening lifts, the chamber is controlled, the
+ * hardware bench is punchy, the reveal settles bright.
+ */
+const EXPOSURE_KEYS: { at: number; v: number }[] = [
+  { at: 0.0, v: 1.0 },
+  { at: 0.05, v: 1.06 },
+  { at: 0.16, v: 1.16 },
+  { at: 0.28, v: 1.06 },
+  { at: 0.4, v: 1.1 },
+  { at: 0.52, v: 1.04 },
+  { at: 0.62, v: 1.1 },
+  { at: 0.76, v: 1.0 },
+  { at: 0.9, v: 1.12 },
+  { at: 1.0, v: 1.16 },
+];
+
+export function exposureAt(journey: number): number {
+  for (let i = 0; i < EXPOSURE_KEYS.length - 1; i++) {
+    const a = EXPOSURE_KEYS[i];
+    const b = EXPOSURE_KEYS[i + 1];
+    if (journey >= a.at && journey <= b.at) {
+      const t = (journey - a.at) / (b.at - a.at);
+      const eased = t * t * (3 - 2 * t);
+      return a.v + (b.v - a.v) * eased;
+    }
+  }
+  return 1.08;
+}
+
 export class World {
   readonly root = new Scene();
   readonly rail = new CameraRail(RAIL_KEYS);
   private rigs: ActiveRig[] = [];
   private sceneSchemes: ((s: M3Scheme) => void)[] = [];
+  private atmosphere: AtmosphereRig;
 
   constructor(binder: ThemeBinder) {
     this.buildEnvironment(binder);
     this.buildSequences(binder);
+    this.atmosphere = buildAtmosphere(binder);
+    this.root.add(this.atmosphere.group);
   }
 
   private buildEnvironment(binder: ThemeBinder) {
@@ -122,7 +157,7 @@ export class World {
        at grazing angles a reflective floor Fresnel-mirrors the environment
        and washes the whole opening shot gray */
     const floor = new Mesh(
-      new PlaneGeometry(150, 760),
+      new PlaneGeometry(400, 760),
       binder.material(
         new MeshStandardMaterial({ metalness: 0.04, roughness: 0.96, envMapIntensity: 0.05 }),
         (s) => (s.mode === "dark" ? s.roles.surfaceDim : s.roles.surfaceContainerLow)
@@ -132,13 +167,28 @@ export class World {
     floor.position.set(0, -0.02, -220);
     this.root.add(floor);
 
-    /* the runway line — a quiet emissive spine stitching all sequences */
-    const spine = new Mesh(
-      new BoxGeometry(0.06, 0.02, 700),
-      emissiveRole(binder, (s) => s.roles.outline, 0.5)
+    /* the runway — a machined emissive inlay stitching all sequences into
+       one navigable place (replaces the old laser-beam spine box) */
+    const runwayTex = buildRunwayTexture();
+    runwayTex.repeat.set(1, 95);
+    const runwayMat = new MeshStandardMaterial({
+      map: runwayTex,
+      emissiveMap: runwayTex,
+      transparent: true,
+      opacity: 0.9,
+      metalness: 0.1,
+      roughness: 0.5,
+      emissiveIntensity: 0.55,
+      depthWrite: false,
+    });
+    binder.material(runwayMat, () => "#141218", (s) =>
+      mixRoles("primary", "onSurface", 0.62)(s)
     );
-    spine.position.set(0, 0.0, -220);
-    this.root.add(spine);
+    const runway = new Mesh(new PlaneGeometry(3.2, 760), runwayMat);
+    runway.rotation.x = -Math.PI / 2;
+    runway.position.set(0, 0.008, -220);
+    runway.renderOrder = 1;
+    this.root.add(runway);
   }
 
   private buildSequences(binder: ThemeBinder) {
@@ -228,6 +278,13 @@ export class World {
     for (const rig of this.rigs) {
       if (journey >= rig.start && journey <= rig.end) rig.update(journey, dt);
     }
+    /* atmosphere is ambient — always on */
+    this.atmosphere.update(dt);
+  }
+
+  /** Governor hook: keep dust sizing correct across DPR stages. */
+  setPixelRatio(dpr: number): void {
+    this.atmosphere.setPixelRatio(dpr);
   }
 
   /** Push a new scheme into every scene-level consumer (textures, instances). */
