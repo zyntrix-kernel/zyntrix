@@ -19,6 +19,7 @@ import { buildDesktopStage, type StageRig } from "./objects/stage";
 import { buildLaptop, type LaptopRig } from "./objects/laptop";
 import { buildInterface, type InterfaceRig } from "./objects/interface";
 import { buildWorkstation, type StationRig } from "./objects/station";
+import { buildRealProps, type PropsRig } from "./objects/props";
 import type { M3Scheme } from "@/lib/m3/theme";
 
 /**
@@ -73,10 +74,12 @@ const RAIL_KEYS: RailKey[] = [
   { at: 0.89, pos: [0, 1.7, -283.6], look: [0, 1.1, -296], fov: 52, ease: "out" },
   { at: 0.92, pos: [0, 0.1, -316], look: [0, 0, -330], fov: 54 },
   { at: 0.945, pos: [0, 0, -333], look: [0, 0, -346], fov: 54, ease: "linear" },
-  /* 08 THE REVEAL — arrive early, then hold the final composition */
-  { at: 0.965, pos: [-1, 2.2, -404], look: [-1, 0.5, -430], fov: 52, ease: "out" },
-  { at: 0.985, pos: [-0.7, 1.6, -413.8], look: [-1.2, 0.5, -430.5], fov: 48, ease: "out" },
-  { at: 1.0, pos: [-0.65, 1.6, -414.5], look: [-1.2, 0.5, -430.5], fov: 48 },
+  /* 08 THE REVEAL — arrive early, then hold the final composition.
+     Station furniture sits on its own desk plane (~y 0.33 world after the
+     +3.255 raise), so the camera frames screen-center ≈ y 3.1. */
+  { at: 0.965, pos: [-1, 5.0, -404], look: [-1, 3.1, -430], fov: 52, ease: "out" },
+  { at: 0.985, pos: [-0.7, 4.45, -413.8], look: [-1.2, 3.1, -430.5], fov: 48, ease: "out" },
+  { at: 1.0, pos: [-0.65, 4.45, -414.5], look: [-1.2, 3.1, -430.5], fov: 48 },
 ];
 
 interface ActiveRig {
@@ -122,6 +125,7 @@ export class World {
   private rigs: ActiveRig[] = [];
   private sceneSchemes: ((s: M3Scheme) => void)[] = [];
   private atmosphere: AtmosphereRig;
+  private props!: PropsRig;
 
   constructor(binder: ThemeBinder) {
     this.buildEnvironment(binder);
@@ -264,6 +268,11 @@ export class World {
     /* 08 workstation */
     const station = buildWorkstation(binder);
     place(station, -430);
+    /* The station was authored against its own desk-plane origin; the world
+       floor sits ≈3.25 above that origin, which buried the desk, keyboard,
+       mouse and anything resting on the desk under the floor. Raise the
+       whole station so the desk actually stands on the floor. */
+    station.group.position.y = 3.255;
     station.update(0);
     this.rigs.push({
       start: CHAPTERS[8].start - 0.02,
@@ -271,6 +280,22 @@ export class World {
       update: (j) => station.update(local(j, CHAPTERS[8])),
     });
     this.sceneSchemes.push(() => station.setScheme());
+
+    /* REAL HARDWARE — production-grade GLTF models anchoring chapters
+       02/03/05/08. Loads async, degrades gracefully, scrubs deterministically. */
+    this.props = buildRealProps(binder);
+    this.root.add(this.props.group);
+    void this.props.load();
+    this.rigs.push({
+      start: 0,
+      end: 1.02,
+      update: (j, dt) => this.props.update(j, dt),
+    });
+  }
+
+  /** Stop any in-flight async prop construction (engine teardown). */
+  dispose(): void {
+    this.props.cancel();
   }
 
   /** Called on every frame by the engine. */

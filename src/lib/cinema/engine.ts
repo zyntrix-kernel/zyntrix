@@ -13,6 +13,7 @@ import {
 import { ThemeBinder } from "./palette";
 import { World, chapterAt, exposureAt, type ChapterId } from "./world";
 import { createPostPipeline, type PostPipeline } from "./post";
+import { disposeGltfPipeline } from "./loaders";
 import { buildScheme, type M3Mode } from "@/lib/m3/theme";
 
 /**
@@ -155,6 +156,8 @@ export class FilmEngine {
     this.stop();
     window.removeEventListener("resize", this.resize);
     this.canvas.removeEventListener("webglcontextlost", this.onContextLost);
+    this.world.dispose();
+    disposeGltfPipeline();
     this.pmrem?.dispose();
     this.post?.dispose();
     this.post = null;

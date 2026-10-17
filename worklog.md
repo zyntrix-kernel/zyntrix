@@ -192,3 +192,26 @@ Work Log:
 Stage Summary:
 - The page no longer looks basic: it now has a film grade (bloom/grain/vignette/CA), living air (GPU dust), authored light pools, a machined runway stitching all 9 chapters, a clear-coated haloed emblem, per-chapter exposure choreography, and a studio whose headers/cards/controls move with the same motion language. All new motion is a pure function of (journey, dt) except ambient dust/grain; HOT/DISPLAY architecture, drag pipeline, dark-from-start, and all product features untouched.
 - Found+fixed a latent real bug (fog color never bound) that would have broken light mode forever.
+
+---
+Task ID: real-3d
+Agent: Z.ai Code (main)
+Task: "USE REAL 3D high detailed models if available" — weave production-grade GLTF models into the scroll-film (follows the "grade" pass; P0 dark/drag already verified)
+
+Work Log:
+- Network probe: GitHub raw reachable; pmndrs/poly CDNs blocked; sparse-cloned mrdoob/three.js examples to list the real glTF catalog; no real laptop exists in any reachable source (hardware dissection stays procedural — it must, to explode).
+- Selected + staged 4 thematic models into public/models/ (gears.glb DRACO 80K, ShaderBall.glb 88K tris, steampunk_camera.glb 20K tris, IridescenceLamp.glb 19K tris w/ transmission+iridescence) + local DRACO decoder (public/models/draco) — zero runtime CDN dependency; attribution note in public/models/README.md.
+- NEW src/lib/cinema/loaders.ts: fetch-cached ArrayBuffer GLB loading + GLTFLoader.parse + DRACOLoader; cache survives engine dispose (no resurrected GPU resources); every failure path → null (graceful degradation).
+- NEW src/lib/cinema/objects/props.ts: PropsRig with per-chapter visibility windows (no off-camera draw cost), all motion pure f(journey) (bidirectional scrub-exact), cancel() for teardown, contact shadows via makeShadowTexture, all accents through ThemeBinder (no hardcoded palette colors):
+  - 02 gear train: fly-over gear at the corridor mouth, deep-left sentry, big core gear where the arcs converge (permanent authored SpotLight so window toggling never recompiles shaders); semi-metallic graphite teeth (tone 64) after two "black metal" iterations.
+  - 03 ShaderBall: turntable instrument; Preview_Mesh re-authored as primary-tinted clearcoat chrome; Calibration_Mesh re-bound to live neutral surface tone.
+  - 05 steampunk camera on an authored 3-leg tripod aimed at the live display, emissive tally light.
+  - 08 IridescenceLamp on the reveal desk (bulb emitter + theme-tinted spotlight pool + glow).
+- REAL BUG FOUND+FIXED (pre-existing): the entire station was buried below the world floor (desk top y=-2.925 vs floor y≈-0.02) — the reveal had been rendering a floating display and a half-sunk tower with desk/keyboard/mouse invisible. Raised station +3.255 and re-aimed the last 3 rail keys (pos y 4.45-5.0, look y 3.1) to frame the now-grounded composition.
+- Lamp placement forensics (browser-verified): dark glass on a 2%-albedo desk against black void reads as nothing; final placement silhouettes it against the live display (z in front of the screen plane) with bulb bloom carrying the read.
+- ESLint: added public/** to ignores (vendored minified draco_wasm_wrapper.js tripped lint).
+- Browser-verified: all 4 units load; gears fly-over/core beats; ShaderBall chrome + theme re-tint (Forest seed → green chrome ball, live HUD unaffected); light mode airy flip; full-journey sweep zero console/page errors; mobile 390px composes (gear fills narrow frame intentionally); P0 regressions PASS (html.dark + lab(2.75) first paint; real-pointer drag commits exact +120/+40 px with scrollY frozen 6214→6214); lint clean; tsc clean under src/.
+
+Stage Summary:
+- The film now mixes authored procedural scenography with four real, high-detail PBR models, each carrying narrative weight (engine gears, calibration instrument, cinema camera, desk lamp) instead of decoration; every accent still derives from the live HCT scheme.
+- Found and fixed a shipping bug (buried reveal furniture) that predated this task.
