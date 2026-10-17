@@ -9,6 +9,12 @@ import { CHAPTERS } from "@/lib/cinema/world";
 import type { FilmEngine } from "@/lib/cinema/engine";
 import { buildScheme, SEED_PRESETS, toneToHex, type M3Mode, type M3Scheme } from "@/lib/m3/theme";
 import { cn } from "@/lib/utils";
+import { M3ButtonLink } from "@/components/m3/primitives";
+import {
+  StateLayer,
+  Tipped,
+  useInteractiveSurface,
+} from "@/components/m3/interactive";
 
 const FilmCanvas = dynamic(() => import("./film-canvas"), { ssr: false });
 
@@ -258,13 +264,10 @@ export function FilmSection({
             {/* Chapter 08 CTA */}
             {chapter === 8 && (
               <div className="pointer-events-auto mt-7">
-                <a
-                  href="#customize"
-                  className="m3-btn m3-btn-filled m3-btn-lg font-sans"
-                >
+                <M3ButtonLink href="#customize" size="lg">
                   Enter the studio
-                  <ChevronDown className="h-5 w-5" aria-hidden="true" />
-                </a>
+                  <ChevronDown className="h-5 w-5 transition-transform duration-300 [transition-timing-function:var(--ease-spring)] group-hover:translate-y-0.5" aria-hidden="true" />
+                </M3ButtonLink>
               </div>
             )}
 
@@ -285,34 +288,15 @@ export function FilmSection({
         {/* chapter navigation rail */}
         <nav
           aria-label="Film chapters"
-          className="pointer-events-auto absolute right-3 top-1/2 hidden -translate-y-1/2 flex-col items-end gap-2.5 sm:right-5 md:flex"
+          className="group/rail pointer-events-auto absolute right-3 top-1/2 hidden -translate-y-1/2 flex-col items-end gap-2.5 sm:right-5 md:flex"
         >
           {CHAPTERS.map((c, i) => (
-            <button
+            <ChapterDot
               key={c.id}
-              onClick={() => jumpToChapter(i)}
-              aria-current={chapter === i ? "true" : undefined}
-              aria-label={`Jump to chapter ${COPY[i].no}: ${c.title}`}
-              className="group flex items-center gap-2.5 outline-offset-4"
-            >
-              <span
-                className={cn(
-                  "font-mono text-[10px] tracking-widest transition-all duration-300",
-                  chapter === i
-                    ? "text-white/90 opacity-100"
-                    : "text-white/50 opacity-0 group-hover:opacity-100"
-                )}
-              >
-                {COPY[i].no}
-              </span>
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "h-[3px] rounded-full transition-all duration-500 [transition-timing-function:var(--ease-enter)]",
-                  chapter === i ? "w-8 bg-white" : "w-3 bg-white/40 group-hover:bg-white/70"
-                )}
-              />
-            </button>
+              index={i}
+              active={chapter === i}
+              onJump={() => jumpToChapter(i)}
+            />
           ))}
         </nav>
       </div>
@@ -340,28 +324,31 @@ function SeedHUD({
     <div>
       <p
         className={cn(
-          "font-mono text-[10px] tracking-[0.25em] tabular-nums",
+          "flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] tabular-nums",
           glass ? "text-white/60" : "text-[var(--m3-on-surface-variant)]"
         )}
       >
-        LIVE SOURCE · {source.toUpperCase()}
+        LIVE SOURCE
+        <motion.span
+          key={source}
+          aria-hidden="true"
+          initial={{ scale: 0.4, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 480, damping: 26 }}
+          className="inline-block h-2.5 w-2.5 rounded-full shadow-[0_0_8px_currentColor]"
+          style={{ background: source, color: source }}
+        />
+        {source.toUpperCase()}
       </p>
       <div role="group" aria-label="Seed color presets" className="mt-3 flex flex-wrap gap-2">
         {SEED_PRESETS.map((p) => (
-          <button
+          <HudSwatch
             key={p.hex}
-            onClick={() => onSourceChange(p.hex)}
-            aria-pressed={source === p.hex}
-            aria-label={`Seed ${p.name}`}
-            title={p.name}
-            className={cn(
-              "h-8 w-8 rounded-full transition-transform duration-200 [transition-timing-function:var(--ease-spring)] hover:scale-110",
-              source === p.hex &&
-                (glass
-                  ? "scale-110 ring-2 ring-white ring-offset-2 ring-offset-black/40"
-                  : "scale-110 ring-2 ring-[var(--m3-on-surface)] ring-offset-2 ring-offset-[var(--m3-surface-container)]")
-            )}
-            style={{ background: p.hex }}
+            name={p.name}
+            hex={p.hex}
+            selected={source === p.hex}
+            glass={glass}
+            onSelect={() => onSourceChange(p.hex)}
           />
         ))}
       </div>
@@ -369,7 +356,7 @@ function SeedHUD({
         role="group"
         aria-label="Theme mode"
         className={cn(
-          "mt-3.5 inline-flex rounded-full p-0.5",
+          "relative mt-3.5 inline-flex rounded-full p-0.5",
           glass ? "border border-white/15" : "border border-[var(--m3-outline-variant)]"
         )}
       >
@@ -379,21 +366,111 @@ function SeedHUD({
             onClick={() => onModeChange(m)}
             aria-pressed={mode === m}
             className={cn(
-              "rounded-full px-4 py-1.5 text-xs font-medium capitalize transition-colors duration-200",
+              "relative rounded-full px-4 py-1.5 text-xs font-medium capitalize transition-colors duration-200",
               mode === m
                 ? glass
-                  ? "bg-white text-black"
-                  : "bg-[var(--m3-primary)] text-[var(--m3-on-primary)]"
+                  ? "text-black"
+                  : "text-[var(--m3-on-primary)]"
                 : glass
                   ? "text-white/70 hover:text-white"
                   : "text-[var(--m3-on-surface-variant)] hover:text-[var(--m3-on-surface)]"
             )}
           >
-            {m}
+            {mode === m && (
+              <motion.span
+                layoutId="hud-mode-thumb"
+                aria-hidden="true"
+                className={cn(
+                  "absolute inset-0 rounded-full",
+                  glass ? "bg-white" : "bg-[var(--m3-primary)]"
+                )}
+                transition={{ type: "spring", stiffness: 460, damping: 38 }}
+              />
+            )}
+            <span className="relative z-10">{m}</span>
           </button>
         ))}
       </div>
     </div>
+  );
+}
+
+function HudSwatch({
+  name,
+  hex,
+  selected,
+  glass,
+  onSelect,
+}: {
+  name: string;
+  hex: string;
+  selected: boolean;
+  glass: boolean;
+  onSelect: () => void;
+}) {
+  const { ref, surfaceProps } = useInteractiveSurface<HTMLButtonElement>({
+    ripple: false,
+  });
+  return (
+    <Tipped tip={name} side="top" gap={12}>
+      <motion.button
+        ref={ref}
+        onClick={onSelect}
+        aria-pressed={selected}
+        aria-label={`Seed ${name}`}
+        whileTap={{ scale: 0.88 }}
+        className={cn(
+          "relative h-8 w-8 overflow-hidden rounded-full transition-[scale] duration-200 [transition-timing-function:var(--ease-spring)] hover:scale-110",
+          selected &&
+            (glass
+              ? "scale-110 ring-2 ring-white ring-offset-2 ring-offset-black/40"
+              : "scale-110 ring-2 ring-[var(--m3-on-surface)] ring-offset-2 ring-offset-[var(--m3-surface-container)]")
+        )}
+        {...surfaceProps}
+        style={{ background: hex }}
+      >
+        <StateLayer />
+      </motion.button>
+    </Tipped>
+  );
+}
+
+function ChapterDot({
+  index,
+  active,
+  onJump,
+}: {
+  index: number;
+  active: boolean;
+  onJump: () => void;
+}) {
+  return (
+    <button
+      onClick={onJump}
+      aria-current={active ? "true" : undefined}
+      aria-label={`Jump to chapter ${COPY[index].no}: ${CHAPTERS[index].title}`}
+      className="group flex items-center gap-2.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-white/80"
+    >
+      <span
+        className={cn(
+          "font-mono text-[10px] tracking-widest transition-all duration-300",
+          active
+            ? "text-white/90 opacity-100"
+            : "text-white/50 opacity-0 group-hover/rail:opacity-100"
+        )}
+      >
+        {COPY[index].no}
+      </span>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "h-[3px] rounded-full transition-all duration-500 [transition-timing-function:var(--ease-enter)]",
+          active
+            ? "w-8 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+            : "w-3 bg-white/40 group-hover:bg-white/70"
+        )}
+      />
+    </button>
   );
 }
 
@@ -456,10 +533,10 @@ function FilmPoster({
           )}
           {i === 8 && (
             <div className="mt-7">
-              <a href="#customize" className="m3-btn m3-btn-filled m3-btn-lg">
+              <M3ButtonLink href="#customize" size="lg">
                 Enter the studio
                 <ChevronDown className="h-5 w-5" aria-hidden="true" />
-              </a>
+              </M3ButtonLink>
             </div>
           )}
         </section>

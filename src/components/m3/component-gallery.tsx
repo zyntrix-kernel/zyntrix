@@ -1,6 +1,29 @@
-import { useState } from "react";
-import { Bookmark, Home, Pencil, Plus, Search, Settings, ThumbsUp } from "lucide-react";
-import { M3Button, M3Chip, M3Fab, M3Switch, Reveal, SectionHeader } from "./primitives";
+"use client";
+
+import { useRef, useState } from "react";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import {
+  Bookmark,
+  Home,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Search,
+  Settings,
+  ThumbsUp,
+  X,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { M3Button, M3Chip, M3Fab, M3RadioPair, M3Switch, Reveal, SectionHeader } from "./primitives";
+import { StateLayer, useInteractiveSurface } from "./interactive";
+import { cn } from "@/lib/utils";
+
+const NAV_ITEMS = [
+  { icon: Home, label: "Home" },
+  { icon: Bookmark, label: "Saved" },
+  { icon: ThumbsUp, label: "Liked" },
+  { icon: Settings, label: "Settings" },
+];
 
 export function ComponentGallery() {
   const [sw, setSw] = useState(true);
@@ -17,7 +40,7 @@ export function ComponentGallery() {
         >
           The same design language your apps will speak once the theme is
           applied — buttons, chips, fields and cards straight from the M3
-          specification.
+          specification. Every control below is live: touch it.
         </SectionHeader>
 
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -39,7 +62,7 @@ export function ComponentGallery() {
           {/* FABs */}
           <Reveal delay={0.05} className="h-full">
             <GalleryCard title="Floating action buttons">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <M3Fab size="sm" label="Edit">
                   <Pencil className="h-4 w-4" aria-hidden="true" />
                 </M3Fab>
@@ -71,7 +94,7 @@ export function ComponentGallery() {
             </GalleryCard>
           </Reveal>
 
-          {/* Switch + slider + radio */}
+          {/* Switch + radio + progress */}
           <Reveal delay={0.15} className="h-full">
             <GalleryCard title="Selection controls">
               <div className="space-y-4">
@@ -81,27 +104,8 @@ export function ComponentGallery() {
                   </span>
                   <M3Switch checked={sw} onCheckedChange={setSw} label="Color from wallpaper" />
                 </div>
-                <div className="flex items-center gap-3" aria-hidden="true">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[var(--m3-primary)]">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[var(--m3-primary)]" />
-                  </span>
-                  <span className="text-sm text-[var(--m3-on-surface)]">Dynamic</span>
-                  <span className="ml-3 h-5 w-5 rounded-full border-2 border-[var(--m3-outline)]" />
-                  <span className="text-sm text-[var(--m3-on-surface-variant)]">Static</span>
-                </div>
-                <div
-                  className="h-1.5 w-full rounded-full"
-                  style={{ background: "var(--m3-surface-container-highest)" }}
-                  role="progressbar"
-                  aria-valuenow={60}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                >
-                  <div
-                    className="h-1.5 w-[60%] rounded-full"
-                    style={{ background: "var(--m3-primary)" }}
-                  />
-                </div>
+                <RadioDemo />
+                <ProgressDemo />
               </div>
             </GalleryCard>
           </Reveal>
@@ -109,18 +113,7 @@ export function ComponentGallery() {
           {/* Text field */}
           <Reveal delay={0.2} className="h-full">
             <GalleryCard title="Text field (filled)">
-              <label className="block">
-                <span className="px-4 text-xs font-medium text-[var(--m3-primary)]">
-                  Wallpaper search
-                </span>
-                <div className="rounded-t-xl border-b-2 border-[var(--m3-on-surface-variant)] bg-[var(--m3-surface-container-highest)] px-4 pb-2 pt-0.5 transition-colors focus-within:border-[var(--m3-primary)]">
-                  <input
-                    className="w-full bg-transparent text-sm text-[var(--m3-on-surface)] outline-none placeholder:text-[var(--m3-on-surface-variant)]"
-                    placeholder="Type a color name…"
-                    aria-label="Wallpaper search"
-                  />
-                </div>
-              </label>
+              <TextFieldDemo />
             </GalleryCard>
           </Reveal>
 
@@ -128,15 +121,15 @@ export function ComponentGallery() {
           <Reveal delay={0.25} className="h-full">
             <GalleryCard title="Cards">
               <div className="grid gap-2.5 sm:grid-cols-3">
-                <div className="rounded-2xl bg-[var(--m3-surface-container-low)] p-3 shadow-md">
+                <div className="m3-card rounded-2xl bg-[var(--m3-surface-container-low)] p-3 shadow-md transition-transform duration-300 [transition-timing-function:var(--ease-enter)] hover:-translate-y-0.5">
                   <p className="text-xs font-medium text-[var(--m3-on-surface)]">Elevated</p>
                   <p className="mt-0.5 text-[11px] text-[var(--m3-on-surface-variant)]">shadow · tonal</p>
                 </div>
-                <div className="rounded-2xl bg-[var(--m3-surface-container-highest)] p-3">
+                <div className="m3-card rounded-2xl bg-[var(--m3-surface-container-highest)] p-3 transition-transform duration-300 [transition-timing-function:var(--ease-enter)] hover:-translate-y-0.5">
                   <p className="text-xs font-medium text-[var(--m3-on-surface)]">Filled</p>
                   <p className="mt-0.5 text-[11px] text-[var(--m3-on-surface-variant)]">no shadow</p>
                 </div>
-                <div className="rounded-2xl border border-[var(--m3-outline)] p-3">
+                <div className="m3-card rounded-2xl border border-[var(--m3-outline)] p-3 transition-transform duration-300 [transition-timing-function:var(--ease-enter)] hover:-translate-y-0.5">
                   <p className="text-xs font-medium text-[var(--m3-on-surface)]">Outlined</p>
                   <p className="mt-0.5 text-[11px] text-[var(--m3-on-surface-variant)]">1dp border</p>
                 </div>
@@ -147,52 +140,14 @@ export function ComponentGallery() {
           {/* Navigation bar */}
           <Reveal delay={0.3} className="h-full">
             <GalleryCard title="Navigation bar">
-              <nav
-                className="flex items-center justify-around rounded-3xl bg-[var(--m3-surface-container)] px-2 py-2"
-                aria-hidden="true"
-              >
-                {[
-                  { icon: Home, label: "Home", active: true },
-                  { icon: Bookmark, label: "Saved" },
-                  { icon: ThumbsUp, label: "Liked" },
-                  { icon: Settings, label: "Settings" },
-                ].map(({ icon: Icon, label, active }) => (
-                  <span key={label} className="flex flex-col items-center gap-0.5">
-                    <span
-                      className={`flex h-8 w-14 items-center justify-center rounded-full ${
-                        active ? "bg-[var(--m3-secondary-container)]" : ""
-                      }`}
-                    >
-                      <Icon
-                        className={`h-4.5 w-4.5 ${active ? "text-[var(--m3-on-secondary-container)]" : "text-[var(--m3-on-surface-variant)]"}`}
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span
-                      className={`text-[10px] font-medium ${
-                        active ? "text-[var(--m3-on-surface)]" : "text-[var(--m3-on-surface-variant)]"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  </span>
-                ))}
-              </nav>
+              <NavBarDemo />
             </GalleryCard>
           </Reveal>
 
           {/* Snackbar */}
           <Reveal delay={0.35} className="h-full">
             <GalleryCard title="Snackbar">
-              <div
-                aria-hidden="true"
-                className="flex items-center gap-3 rounded-xl bg-[var(--m3-inverse-surface)] px-4 py-3.5 text-[var(--m3-inverse-on-surface)]"
-              >
-                <p className="text-sm">Theme applied</p>
-                <span className="ml-auto text-sm font-medium uppercase text-[var(--m3-inverse-primary)]">
-                  Undo
-                </span>
-              </div>
+              <SnackbarDemo />
             </GalleryCard>
           </Reveal>
 
@@ -200,16 +155,22 @@ export function ComponentGallery() {
           <Reveal delay={0.4} className="h-full">
             <GalleryCard title="Badges">
               <div className="flex items-center gap-5">
-                <span className="relative inline-flex">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--m3-secondary-container)] text-[var(--m3-on-secondary-container)]">
+                <span className="group relative inline-flex">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--m3-secondary-container)] text-[var(--m3-on-secondary-container)] transition-transform duration-300 [transition-timing-function:var(--ease-spring)] group-hover:scale-105">
                     <Pencil className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--m3-error)] px-1 text-[9px] font-medium text-[var(--m3-on-error)]">
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ type: "spring", stiffness: 520, damping: 20, delay: 0.25 }}
+                    className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--m3-error)] px-1 text-[9px] font-medium text-[var(--m3-on-error)]"
+                  >
                     3
-                  </span>
+                  </motion.span>
                 </span>
                 <span
-                  className="h-2.5 w-2.5 rounded-full bg-[var(--m3-error)]"
+                  className="h-2.5 w-2.5 rounded-full bg-[var(--m3-error)] anim-glow-pulse"
                   role="img"
                   aria-label="Small notification badge"
                 />
@@ -225,13 +186,254 @@ export function ComponentGallery() {
   );
 }
 
+/* ------------------------------ live demos ------------------------------ */
+
+function RadioDemo() {
+  const [value, setValue] = useState("Dynamic");
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-sm text-[var(--m3-on-surface-variant)]">Color source</span>
+      <M3RadioPair
+        options={["Dynamic", "Static"]}
+        value={value}
+        onValueChange={setValue}
+        label="Color source demo"
+      />
+    </div>
+  );
+}
+
+function ProgressDemo() {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  return (
+    <div
+      ref={ref}
+      className="relative h-1.5 w-full overflow-hidden rounded-full bg-[var(--m3-surface-container-highest)]"
+      role="progressbar"
+      aria-valuenow={60}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Demo progress"
+    >
+      <motion.div
+        className="relative h-full overflow-hidden rounded-full bg-[var(--m3-primary)]"
+        initial={{ width: "0%" }}
+        animate={inView ? { width: "60%" } : { width: "0%" }}
+        transition={{ duration: 1.15, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span
+          aria-hidden="true"
+          className="anim-progress-sheen absolute inset-0 rounded-full bg-[linear-gradient(100deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%)] bg-[length:220%_100%]"
+        />
+      </motion.div>
+    </div>
+  );
+}
+
+/** M3 filled text field: floating label, active indicator, clear + counter */
+function TextFieldDemo() {
+  const [value, setValue] = useState("");
+  const [focused, setFocused] = useState(false);
+  const active = focused || value.length > 0;
+  const MAX = 24;
+  return (
+    <div className="group relative rounded-t-xl border-b-2 border-[var(--m3-on-surface-variant)] bg-[var(--m3-surface-container-highest)] transition-[border-color,background-color] duration-200 focus-within:border-[var(--m3-primary)] hover:bg-[var(--m3-surface-container-highest)]/70">
+      {/* active indicator — M3's signature bottom bar draw */}
+      <span
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 bg-[var(--m3-primary)] transition-transform duration-300 [transition-timing-function:var(--ease-enter)] group-focus-within:scale-x-100"
+      />
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute left-4 origin-left transition-all duration-200 [transition-timing-function:var(--ease-enter)]",
+          active
+            ? "top-[0.4rem] scale-[0.78] text-xs font-medium text-[var(--m3-primary)]"
+            : "top-1/2 -translate-y-1/2 text-sm text-[var(--m3-on-surface-variant)]"
+        )}
+      >
+        Wallpaper search
+      </span>
+      <input
+        className="w-full bg-transparent pb-2 pt-6 text-sm text-[var(--m3-on-surface)] outline-none"
+        value={value}
+        maxLength={MAX}
+        onChange={(e) => setValue(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        aria-label="Wallpaper search demo"
+      />
+      <AnimatePresence>
+        {value && (
+          <motion.button
+            key="clear"
+            type="button"
+            onClick={() => setValue("")}
+            onMouseDown={(e) => e.preventDefault()}
+            aria-label="Clear search"
+            className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-[var(--m3-on-surface-variant)] transition-[background-color,scale] duration-150 hover:bg-[var(--m3-surface-container)] active:scale-90 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)]"
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.4, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 560, damping: 30 }}
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "absolute bottom-1 right-3 font-mono text-[10px] tabular-nums text-[var(--m3-on-surface-variant)] transition-opacity duration-200",
+          focused ? "opacity-70" : "opacity-0"
+        )}
+      >
+        {value.length}/{MAX}
+      </span>
+    </div>
+  );
+}
+
+function NavBarDemo() {
+  const [active, setActive] = useState(0);
+  return (
+    <nav
+      className="flex items-center justify-around rounded-3xl bg-[var(--m3-surface-container)] px-2 py-2"
+      aria-label="Navigation bar demo"
+    >
+      {NAV_ITEMS.map(({ icon: Icon, label }, i) => (
+        <NavBarItem
+          key={label}
+          icon={Icon}
+          label={label}
+          active={active === i}
+          onSelect={() => setActive(i)}
+        />
+      ))}
+    </nav>
+  );
+}
+
+function NavBarItem({
+  icon: Icon,
+  label,
+  active,
+  onSelect,
+}: {
+  icon: typeof Home;
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const { ref, surfaceProps } = useInteractiveSurface<HTMLButtonElement>({
+    ripple: false,
+    bloomRadius: 56,
+  });
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onSelect}
+      aria-pressed={active}
+      aria-label={`${label} tab (demo)`}
+      className="group flex flex-col items-center gap-0.5 rounded-2xl p-1 transition-[scale] duration-200 [transition-timing-function:var(--ease-spring)] active:scale-90 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
+      {...surfaceProps}
+    >
+      <span
+        className={cn(
+          "relative flex h-8 w-14 items-center justify-center overflow-hidden rounded-full transition-[background-color] duration-300",
+          active && "bg-[var(--m3-secondary-container)]"
+        )}
+      >
+        {active && (
+          <motion.span
+            layoutId="gallery-nav-pill"
+            className="absolute inset-0 rounded-full bg-[var(--m3-secondary-container)]"
+            transition={{ type: "spring", stiffness: 480, damping: 38 }}
+            aria-hidden="true"
+          />
+        )}
+        <StateLayer />
+        <Icon
+          className={cn(
+            "relative z-10 h-[18px] w-[18px] transition-[color,transform] duration-300 [transition-timing-function:var(--ease-spring)]",
+            active
+              ? "text-[var(--m3-on-secondary-container)]"
+              : "text-[var(--m3-on-surface-variant)] group-hover:scale-110 group-hover:text-[var(--m3-on-surface)]"
+          )}
+          aria-hidden="true"
+        />
+      </span>
+      <span
+        className={cn(
+          "text-[10px] font-medium transition-colors duration-200",
+          active
+            ? "text-[var(--m3-on-surface)]"
+            : "text-[var(--m3-on-surface-variant)]"
+        )}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function SnackbarDemo() {
+  const [visible, setVisible] = useState(true);
+  const { toast } = useToast();
+  return (
+    <div className="flex min-h-[3.25rem] flex-col items-start justify-center">
+      <AnimatePresence mode="wait" initial={false}>
+        {visible ? (
+          <motion.div
+            key="snack"
+            role="status"
+            className="flex w-full items-center gap-3 rounded-xl bg-[var(--m3-inverse-surface)] px-4 py-3.5 text-[var(--m3-inverse-on-surface)] shadow-lg"
+            initial={{ y: 26, opacity: 0, scale: 0.97 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 18, opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="text-sm">Theme applied</p>
+            <button
+              type="button"
+              onClick={() => {
+                setVisible(false);
+                toast({ title: "Theme change reverted", description: "Snackbar action demo" });
+              }}
+              className="group/snack relative ml-auto overflow-hidden rounded-full px-2.5 py-1 text-sm font-medium uppercase tracking-wide text-[var(--m3-inverse-primary)] transition-[background-color,scale] duration-150 [transition-timing-function:var(--ease-enter)] hover:bg-white/10 active:scale-95 focus-visible:outline-2 focus-visible:outline-[var(--m3-inverse-primary)]"
+            >
+              <StateLayer />
+              <span className="relative z-10">Undo</span>
+            </button>
+          </motion.div>
+        ) : (
+          <motion.button
+            key="replay"
+            type="button"
+            onClick={() => setVisible(true)}
+            className="m3-btn m3-btn-text h-9"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            Show snackbar
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function GalleryCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="m3-card h-full rounded-[28px] border border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-6">
       <h3 className="mb-5 flex items-center gap-2 text-sm font-medium uppercase tracking-wider text-[var(--m3-primary)]">
         <span
           aria-hidden="true"
-          className="h-2 w-2 shrink-0 rounded-full"
+          className="h-2 w-2 shrink-0 rounded-full transition-transform duration-500 [transition-timing-function:var(--ease-spring)] hover:scale-150"
           style={{ background: "linear-gradient(135deg, var(--m3-primary), var(--m3-tertiary))" }}
         />
         {title}

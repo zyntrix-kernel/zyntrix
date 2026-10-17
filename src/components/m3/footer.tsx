@@ -37,7 +37,7 @@ export function Footer({ mode }: { mode: M3Mode }) {
               <li key={href}>
                 <a
                   href={href}
-                  className="rounded-full px-3 py-2 transition-colors hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)] focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
+                  className="relative rounded-full px-3 py-2 transition-colors after:absolute after:inset-x-3 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:[transition-timing-function:var(--ease-enter)] hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)] hover:after:scale-x-100 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2 focus-visible:after:scale-x-100"
                 >
                   {label}
                 </a>

@@ -220,12 +220,82 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .anim-float, .anim-drift, .anim-drift-slow, .anim-glow-pulse { animation: none; }
+  .anim-float, .anim-drift, .anim-drift-slow, .anim-glow-pulse, .anim-progress-sheen {
+    animation: none;
+  }
+  .ripple-ink { display: none; }
+  .state-layer { transition: none; }
   /* Retint and decor keep only opacity/color feedback under reduced motion */
   [data-retint="true"],
   [data-retint="true"] * {
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---- Microinteraction engine primitives ----
+   State layer paints from the pointer-enter origin (vars set by
+   useInteractiveSurface). Ink ripple is transform+opacity only.
+   Both are inert without a fine pointer and under reduced motion. */
+
+.state-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle var(--sl-r, 150px) at var(--sl-x, 50%) var(--sl-y, 50%),
+    currentColor,
+    transparent 72%
+  );
+  opacity: calc(var(--sl-o, 0) * 0.09);
+  transition: opacity 0.45s var(--ease-enter);
+  will-change: opacity;
+}
+/* Pressed surfaces deepen their layer (hook sets --sl-o: 1.5) */
+:is(button, a, [role="button"], [role="switch"], [role="radio"]):active
+  > .state-layer {
+  transition-duration: 0.15s;
+}
+
+@keyframes m3-ripple {
+  from {
+    transform: scale(0.05);
+    opacity: 0.22;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.ripple-ink {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: currentColor;
+  transform: scale(0.05);
+  animation: m3-ripple 0.72s var(--ease-out-quint) forwards;
+}
+
+/* "Arrow pass" — the outbound arrow cycles out right and re-enters
+   from the left while its card is hovered. */
+@keyframes m3-arrow-pass {
+  0% { transform: translateX(0); opacity: 1; }
+  42% { transform: translateX(7px); opacity: 0; }
+  50% { transform: translateX(-7px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+.group:hover .arrow-pass,
+.group:focus-visible .arrow-pass {
+  animation: m3-arrow-pass 0.9s var(--ease-move) infinite;
+}
+
+/* Sheen that travels through an active progress fill */
+@keyframes m3-progress-sheen {
+  from { background-position: 200% 0; }
+  to { background-position: -60% 0; }
+}
+.anim-progress-sheen {
+  animation: m3-progress-sheen 2.6s var(--ease-move) infinite;
 }
 
 /* ---- Premium M3 Kubuntu studio helpers ---- */
@@ -358,16 +428,18 @@ html {
   white-space: nowrap;
   user-select: none;
   cursor: pointer;
-  /* Asymmetric press: fast in, springy settle out */
+  /* Asymmetric press: fast in, springy settle out. Uses the individual
+     `scale` property so magnetism (`translate`) composes independently. */
   transition:
     box-shadow var(--dur-surface) var(--ease-enter),
     background-color var(--dur-control) ease,
     color var(--dur-control) ease,
     border-color var(--dur-control) ease,
-    transform 0.32s var(--ease-spring);
+    scale 0.34s var(--ease-spring),
+    translate 0.3s var(--ease-move);
 }
 .m3-btn:active {
-  transform: scale(0.96);
+  scale: 0.96;
   transition-duration: var(--dur-press);
   transition-timing-function: var(--ease-press);
 }
@@ -459,6 +531,13 @@ html {
   height: 3.5rem;
   padding: 0 2rem;
   font-size: 1rem;
+}
+
+/* Ink + state layer are prepended (painted first); explicit stacking
+   keeps labels/icons above both regardless of DOM quirks. */
+.m3-btn > :not(.state-layer):not(.ripple-ink) {
+  position: relative;
+  z-index: 1;
 }
 
 /* Native color input, M3 style */

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Moon, Sun } from "lucide-react";
 import { M3ButtonLink } from "./primitives";
+import { StateLayer, useInteractiveSurface } from "./interactive";
 import { cn } from "@/lib/utils";
 import type { M3Mode } from "@/lib/m3/theme";
 
@@ -125,40 +126,77 @@ export function TopBar({
         </ul>
 
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <button
-            type="button"
-            onClick={onToggleMode}
-            aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-            className="relative grid h-10 w-10 place-items-center rounded-full text-[var(--m3-on-surface-variant)] transition-[background-color,color,transform] duration-300 [transition-timing-function:var(--ease-spring)] hover:scale-105 hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)] active:scale-95 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={mode}
-                className="grid place-items-center"
-                initial={{ opacity: 0, rotate: -70, scale: 0.6 }}
-                animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                exit={{ opacity: 0, rotate: 70, scale: 0.6 }}
-                transition={{ duration: 0.22, ease: EASE }}
-              >
-                {mode === "dark" ? (
-                  <Sun className="h-5 w-5" aria-hidden="true" />
-                ) : (
-                  <Moon className="h-5 w-5" aria-hidden="true" />
-                )}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+          <ModeToggle mode={mode} onToggleMode={onToggleMode} />
           <M3ButtonLink
             href="#download"
             size="sm"
             className="h-10 px-4"
             aria-label="Download the theme package"
           >
-            <Download className="h-4 w-4" aria-hidden="true" />
+            <Download className="h-4 w-4 transition-transform duration-300 [transition-timing-function:var(--ease-spring)] group-hover:-translate-y-0.5 group-hover:scale-110" aria-hidden="true" />
             <span className="hidden sm:inline">Get theme</span>
           </M3ButtonLink>
         </div>
       </nav>
     </header>
+  );
+}
+
+/** Sun/moon swap + click pulse ring — the mode toggle as a micro-ritual. */
+function ModeToggle({
+  mode,
+  onToggleMode,
+}: {
+  mode: M3Mode;
+  onToggleMode: () => void;
+}) {
+  const { ref, surfaceProps } = useInteractiveSurface<HTMLButtonElement>({
+    ripple: false,
+  });
+  const [pulse, setPulse] = useState(0);
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={() => {
+        setPulse((p) => p + 1);
+        onToggleMode();
+      }}
+      aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+      className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-full text-[var(--m3-on-surface-variant)] transition-[background-color,color,scale] duration-300 [transition-timing-function:var(--ease-spring)] hover:scale-105 hover:bg-[var(--m3-secondary-container)] hover:text-[var(--m3-on-secondary-container)] active:scale-95 focus-visible:outline-2 focus-visible:outline-[var(--m3-primary)] focus-visible:outline-offset-2"
+      {...surfaceProps}
+    >
+      <StateLayer />
+      {/* click pulse ring */}
+      <AnimatePresence>
+        {pulse > 0 && (
+          <motion.span
+            key={pulse}
+            aria-hidden="true"
+            className="absolute inset-1 rounded-full border-2 border-[var(--m3-primary)]"
+            initial={{ opacity: 0.6, scale: 0.55 }}
+            animate={{ opacity: 0, scale: 1.25 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={mode}
+          className="relative z-10 grid place-items-center"
+          initial={{ opacity: 0, rotate: -70, scale: 0.6 }}
+          animate={{ opacity: 1, rotate: 0, scale: 1 }}
+          exit={{ opacity: 0, rotate: 70, scale: 0.6 }}
+          transition={{ duration: 0.22, ease: EASE }}
+        >
+          {mode === "dark" ? (
+            <Sun className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <Moon className="h-5 w-5" aria-hidden="true" />
+          )}
+        </motion.span>
+      </AnimatePresence>
+    </button>
   );
 }

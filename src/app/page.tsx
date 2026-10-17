@@ -13,6 +13,10 @@ import { Downloads } from "@/components/m3/downloads";
 import { InstallGuide } from "@/components/m3/install-guide";
 import { Footer } from "@/components/m3/footer";
 import {
+  StateLayer,
+  useInteractiveSurface,
+} from "@/components/m3/interactive";
+import {
   buildScheme,
   schemeToCssVars,
   DEFAULT_SOURCE,
@@ -102,10 +106,10 @@ export default function Home() {
         className="relative flex min-h-screen flex-col bg-[var(--m3-surface)] font-sans text-[var(--m3-on-surface)]"
         style={{ ...cssVars, colorScheme: mode }}
       >
-        {/* Scroll progress */}
+        {/* Scroll progress — a lit filament with a theme-tinted glow head */}
         <motion.div
           aria-hidden="true"
-          className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-[var(--m3-primary)] via-[var(--m3-tertiary)] to-[var(--m3-primary)]"
+          className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left rounded-r-full bg-gradient-to-r from-[var(--m3-primary)] via-[var(--m3-tertiary)] to-[var(--m3-primary)] shadow-[0_0_12px_color-mix(in_srgb,var(--m3-primary)_45%,transparent)]"
           style={{ scaleX: progress }}
         />
 
@@ -172,20 +176,35 @@ export default function Home() {
           <Footer mode={mode} />
         </div>
 
-        {/* Back to top */}
-        <a
-          href="#top"
-          aria-label="Back to top"
-          className={cn(
-            "fixed bottom-6 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--m3-primary-container)] text-[var(--m3-on-primary-container)] shadow-xl transition-[opacity,transform,background-color,color] duration-300 [transition-timing-function:var(--ease-enter)] hover:bg-[var(--m3-primary)] hover:text-[var(--m3-on-primary)] active:scale-95 sm:bottom-8 sm:right-8",
-            showTop && !footerVisible
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none translate-y-6 opacity-0"
-          )}
-        >
-          <ArrowUp className="h-5 w-5" aria-hidden="true" />
-        </a>
+        {/* Back to top — magnetic, pointer-lit, arrow nudges upward */}
+        <BackToTop show={showTop && !footerVisible} />
       </div>
     </MotionConfig>
+  );
+}
+
+function BackToTop({ show }: { show: boolean }) {
+  const { ref, surfaceProps } = useInteractiveSurface<HTMLAnchorElement>({
+    magnet: 5,
+    bloomRadius: 64,
+  });
+  return (
+    <a
+      ref={ref}
+      href="#top"
+      aria-label="Back to top"
+      className={cn(
+        "group fixed bottom-6 right-5 z-50 grid h-12 w-12 place-items-center overflow-hidden rounded-2xl bg-[var(--m3-primary-container)] text-[var(--m3-on-primary-container)] shadow-xl transition-[opacity,translate,background-color,color,box-shadow] duration-300 [transition-timing-function:var(--ease-enter)] hover:bg-[var(--m3-primary)] hover:text-[var(--m3-on-primary)] hover:shadow-[0_10px_34px_color-mix(in_srgb,var(--m3-primary)_45%,transparent)] active:scale-95 sm:bottom-8 sm:right-8",
+        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
+      )}
+      {...surfaceProps}
+      style={{ transitionProperty: "opacity, translate, background-color, color, box-shadow" }}
+    >
+      <StateLayer />
+      <ArrowUp
+        className="relative z-10 h-5 w-5 transition-transform duration-300 [transition-timing-function:var(--ease-spring)] group-hover:-translate-y-1"
+        aria-hidden="true"
+      />
+    </a>
   );
 }
