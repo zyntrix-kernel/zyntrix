@@ -242,3 +242,29 @@ Stage Summary:
 - Every interactive surface in the artifact now speaks one microinteraction language: pointer-origin ink, magnetic lean, spring check morphs, staggered entrances, drawn timelines, floating labels, live demos instead of dead mocks — all transform/opacity-only, rAF-coalesced, fine-pointer/reduced-motion gated, and toast-feedback'd where state changes.
 - Real fidelity fix along the way: ripples are no longer desktop-only (authentic Material touch ink), while bloom-origin + magnetism stay fine-pointer luxuries.
 - HOT/DISPLAY architecture, drag pipeline, dark-from-start, all product features and the 3D film untouched; lint + tsc clean; zero console/page errors.
+
+---
+Task ID: story-ui
+Agent: Z.ai Code (main)
+Task: "just replace the 3d story with actual ui components" → retire the WebGL film, tell the story with real UI components
+
+Work Log:
+- Removed the 3D story entirely: deleted src/components/cinema/ (film-section.tsx, film-canvas.tsx) and src/lib/cinema/ (engine, world, rail, palette, post, atmosphere, textures, loaders, objects/*); removed three + @types/three from package.json and bun-installed the lockfile (2 packages removed). Zero cinema/three references remain in src/.
+- Built src/components/story/story-section.tsx — THE COMPONENT STORY: same proven spine (7 × 100vh track → sticky stage → chapter = pure function of one scroll authority via useMotionValueEvent → chapter rail with aria-current jumps), but every scene is a live, theme-reactive composition of actual UI components:
+  - 00 Hero: gradient display title, LIVE SOURCE card with real M3Switch, toggleable M3Chips, spring-staggered tonal ramps from the live scheme, role-count badge.
+  - 01 One seed: real seed swatches (Tipped, spring ring, state layer) that RETINT THE WHOLE PAGE, real HCT readout (HUE°/CHROMA via Hct.fromInt), 4 labeled tonal ramps.
+  - 02 Theme engine: role rows with per-role dot + hex + CopySwap copy buttons (useCopyFlash toast), "+N MORE" badge — counts derived from scheme, not prose.
+  - 03 Control deck: seed swatches + dark/light segmented control (layoutId thumb) bound to page state.
+  - 04 Desktop materializes: Plasma desktop assembled from DOM/UI components only — panel (live clock), Activities chip, tray icons, desktop icons, Konsole window with caret + "scheme live", dock with Tipped app icons; rotateX entrance + spring stagger per layer; wallpaper painted from color-mix of live roles.
+  - 05 One command: terminal card that types `zyntrix install` (setInterval typewriter, reduced-motion → instant via canRipple gate), Copy button with CopySwap + toast, spring success line.
+  - 06 CTA: stat chips + Enter-the-studio/Get-the-theme M3ButtonLinks.
+- Count integrity: ROLE_COUNT / PALETTE_COUNT derived from buildScheme at module level; terminal lines, konsole window, CTA stats and chapter-02 lead all use derived values (exposed a real mismatch — scheme has 36 roles, old copy said 43 — now consistent everywhere in the story).
+- page.tsx: FilmSection → StorySection; skip link reworded; stale "SEQUENCE 09" comments updated.
+- Fixes during build (lint errors): clock setState-in-effect → lazy useState(() => new Date()) + interval-only updates; terminal per-line offsets computed immutably via starts[] instead of let-reassignment in render.
+- VERIFIED in browser (agent-browser, desktop 1280 + mobile 390): dark-from-start (html.dark true, no flash); all 7 chapters render and transition via rail jumps; seed click → --m3-primary updates page-wide (#8fd5b0 green); light↔dark round-trip re-derives every role (surface #f5fbf5 ↔ #0f1511); story role copy → toast verified via scoped snapshot; terminal types to completion with success line; mini-desktop renders with live clock; CTA links present; console clean (only Fast Refresh logs), zero page errors; mobile 390: no horizontal overflow, specimen card wraps; story→studio handoff seam clean; P0 regressions PASS (Dolphin drag: window moved exactly +63/+42 with scrollY frozen 6343→6343, no dragging-class residue). Lint clean; tsc clean under src/.
+- Note: chapter rail a11y snapshot initially showed stale multi-scene refs — direct DOM probe confirmed exactly one scene tree mounted at a time.
+
+Stage Summary:
+- The story is now the product demonstrating itself: no WebGL, no three.js, no fallback matrix — the entire 7-chapter narrative is real M3 UI components bound to the real theme engine, so every seed/mode change re-tints the story live.
+- Bundle sheds the whole three/cinema payload; the only motion costs are transform/opacity springs and one conic aurora.
+- All prior capabilities untouched: HOT/DISPLAY channels, dark-from-start, drag pipeline, customizer, desktop preview, palette showcase, component gallery, downloads, install guide.

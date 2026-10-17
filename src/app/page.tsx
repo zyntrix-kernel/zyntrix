@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useSpring, MotionConfig } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { TopBar } from "@/components/m3/top-bar";
-import { FilmSection } from "@/components/cinema/film-section";
+import { StorySection } from "@/components/story/story-section";
 import { Customizer } from "@/components/m3/customizer";
 import { DesktopPreview } from "@/components/m3/desktop-preview";
 import { PaletteShowcase } from "@/components/m3/palette-showcase";
@@ -117,24 +117,24 @@ export default function Home() {
           href="#customize"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-[var(--m3-primary)] focus:px-4 focus:py-2 focus:text-[var(--m3-on-primary)]"
         >
-          Skip the film — jump to the theme studio
+          Skip the story — jump to the theme studio
         </a>
 
         <TopBar mode={mode} onToggleMode={handleToggleMode} />
 
         <main className="flex-1">
-          {/* SEQUENCES 00–08 — the cinematic journey (WebGL or poster) */}
-          <FilmSection
+          {/* CHAPTERS 00–06 — the story, told by actual UI components */}
+          <StorySection
             source={source}
             mode={mode}
             onSourceChange={handleSourceChange}
             onModeChange={handleModeChange}
           />
 
-          {/* SEQUENCE 09 — the working studio, opaque over the film */}
+          {/* THE WORKING STUDIO — the story hands off to the real thing */}
           <div className="relative z-10 bg-[var(--m3-surface)] shadow-[0_-24px_60px_rgba(0,0,0,0.35)]">
             {/* studio aurora — theme-derived radial washes + film grain give the
-               working sections the same air as the film they follow */}
+               working sections the same air as the story they follow */}
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 overflow-hidden"
