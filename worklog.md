@@ -285,3 +285,20 @@ Work Log:
 Stage Summary:
 - Seed preset switching is now: 1ms React, one cached scheme lookup, one root style commit, a viewport-scoped paint, and a compositor-only veil — the document-wide transition storm, double full-tree reconciliation, and whole-page re-raster are gone. Rapid re-seeding is fluid and the premium retint beat survives as a single GPU-composited wash.
 - No API/product behavior changed; HOT/DISPLAY-era equivalents preserved via cache + memo; dark-from-start, drag pipeline, anchors, scroll-spy, mobile all regression-tested green.
+
+---
+Task ID: push-github-1
+Agent: Z.ai Code (main)
+Task: Create new GitHub repo and push the website with all files and wallpapers
+
+Work Log:
+- Audited git state: 247 tracked files, clean tree, no remote; wallpapers (bloom/dark/light) already tracked
+- Untracked runtime artifacts (db/custom.db, tool-results/, upload/) and added /db/, /tool-results/, /upload/, /agent-ctx/ to .gitignore
+- Secret-scanned all tracked files (no tokens/keys present)
+- Verified GitHub PAT (user: zyntrix-kernel), created public repo `zyntrix` via API (HTTP 201)
+- Pushed main -> origin/main; scrubbed token from .git/config remote URL
+- Verified: remote HEAD == local HEAD (8edaee1f), 272 tree entries, all 3 wallpapers present in public/wallpapers
+
+Stage Summary:
+- Repo live at https://github.com/zyntrix-kernel/zyntrix (public, default branch main)
+- Full website source + brand kit + 3 M3 wallpapers + models pushed; runtime artifacts excluded
