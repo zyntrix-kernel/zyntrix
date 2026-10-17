@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { motion, useScroll, useSpring, MotionConfig } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { TopBar } from "@/components/m3/top-bar";
@@ -24,12 +31,36 @@ import {
 } from "@/lib/m3/theme";
 import { cn } from "@/lib/utils";
 
+/* ---------------------------------------------------------------------------
+   Render discipline.
+   A seed click used to reconcile the ENTIRE page (the 700vh story, the drag
+   desktop, the gallery…) and then run a document-wide color-transition
+   window — the lag users felt while switching presets. Now:
+
+   • Memo'd sections bail out whenever their props are unchanged. Seed swaps
+     re-render only the views that actually display seed data (story scene,
+     customizer, downloads, palette); scroll-only state changes (back-to-top,
+     footer observer) re-render almost nothing.
+   • The retint beat itself costs ZERO React renders — it is a DOM attribute
+     on the root plus one compositor-driven veil (globals.css).
+--------------------------------------------------------------------------- */
+
+const TopBarM = memo(TopBar);
+const StorySectionM = memo(StorySection);
+const CustomizerM = memo(Customizer);
+const DesktopPreviewM = memo(DesktopPreview);
+const PaletteShowcaseM = memo(PaletteShowcase);
+const ComponentGalleryM = memo(ComponentGallery);
+const DownloadsM = memo(Downloads);
+const InstallGuideM = memo(InstallGuide);
+const FooterM = memo(Footer);
+
 export default function Home() {
   const [source, setSource] = useState<string>(DEFAULT_SOURCE);
   const [mode, setMode] = useState<M3Mode>("dark");
   const [showTop, setShowTop] = useState(false);
   const [footerVisible, setFooterVisible] = useState(false);
-  const [retinting, setRetinting] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const retintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const footerRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,16 +97,26 @@ export default function Home() {
     return () => io.disconnect();
   }, []);
 
-  // Color-glide window: opened by user interactions that change theme identity.
+  // Color-glide window — ZERO React renders. The root flips a data attribute
+  // for the veil lifetime (globals.css owns the animation); rapid re-seeds
+  // restart the beat by dropping the attribute, forcing a reflow, re-arming.
   const scheduleRetint = useCallback(() => {
-    setRetinting(true);
+    const el = rootRef.current;
+    if (!el) return;
     if (retintTimer.current) clearTimeout(retintTimer.current);
-    retintTimer.current = setTimeout(() => setRetinting(false), 460);
+    el.removeAttribute("data-retint");
+    void el.offsetWidth;
+    el.setAttribute("data-retint", "true");
+    retintTimer.current = setTimeout(() => {
+      retintTimer.current = null;
+      rootRef.current?.removeAttribute("data-retint");
+    }, 560);
   }, []);
 
   useEffect(() => {
     return () => {
       if (retintTimer.current) clearTimeout(retintTimer.current);
+      rootRef.current?.removeAttribute("data-retint");
     };
   }, []);
 
@@ -102,7 +143,7 @@ export default function Home() {
     <MotionConfig reducedMotion="user">
       <div
         id="top"
-        data-retint={retinting ? "true" : "false"}
+        ref={rootRef}
         className="relative flex min-h-screen flex-col bg-[var(--m3-surface)] font-sans text-[var(--m3-on-surface)]"
         style={{ ...cssVars, colorScheme: mode }}
       >
@@ -120,13 +161,14 @@ export default function Home() {
           Skip the story — jump to the theme studio
         </a>
 
-        <TopBar mode={mode} onToggleMode={handleToggleMode} />
+        <TopBarM mode={mode} onToggleMode={handleToggleMode} />
 
         <main className="flex-1">
           {/* CHAPTERS 00–06 — the story, told by actual UI components */}
-          <StorySection
+          <StorySectionM
             source={source}
             mode={mode}
+            scheme={scheme}
             onSourceChange={handleSourceChange}
             onModeChange={handleModeChange}
           />
@@ -157,23 +199,23 @@ export default function Home() {
               />
             </div>
 
-            <Customizer
+            <CustomizerM
               source={source}
               onSourceChange={handleSourceChange}
               mode={mode}
               onModeChange={handleModeChange}
               roles={scheme.roles}
             />
-            <DesktopPreview mode={mode} />
-            <PaletteShowcase scheme={scheme} />
-            <ComponentGallery />
-            <Downloads source={source} mode={mode} />
-            <InstallGuide mode={mode} />
+            <DesktopPreviewM mode={mode} />
+            <PaletteShowcaseM scheme={scheme} />
+            <ComponentGalleryM />
+            <DownloadsM source={source} mode={mode} />
+            <InstallGuideM mode={mode} />
           </div>
         </main>
 
         <div ref={footerRef}>
-          <Footer mode={mode} />
+          <FooterM mode={mode} />
         </div>
 
         {/* Back to top — magnetic, pointer-lit, arrow nudges upward */}

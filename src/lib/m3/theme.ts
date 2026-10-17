@@ -10,9 +10,23 @@ export type M3Mode = "light" | "dark";
 
 export const DEFAULT_SOURCE = "#67548a";
 
-/** tone(t) of a tonal palette → proper #rrggbb (tone() is ARGB!). */
+/** tone(t) of a tonal palette → proper #rrggbb (tone() is ARGB!).
+ *
+ *  Cached: a TonalPalette is fully determined by its (hue, chroma) pair, so
+ *  that pair is a stable identity across re-created palettes of the same
+ *  seed. Swatch grids resolve dozens of tones per render — the cache turns
+ *  HCT re-solves into Map lookups. */
+const TONE_CACHE_LIMIT = 2048;
+const toneCache = new Map<string, string>();
+
 export function toneToHex(p: TonalPalette, t: number): string {
-  return hexFromArgb(p.tone(t));
+  const key = `${p.hue.toFixed(2)}:${p.chroma.toFixed(2)}:${t}`;
+  const hit = toneCache.get(key);
+  if (hit !== undefined) return hit;
+  const hex = hexFromArgb(p.tone(t));
+  if (toneCache.size >= TONE_CACHE_LIMIT) toneCache.clear();
+  toneCache.set(key, hex);
+  return hex;
 }
 
 /** Wallpaper assets shipped with the theme (client-safe constants) */
@@ -64,9 +78,25 @@ export interface M3Scheme {
 /**
  * Builds a full Material 3 role set from a single source color, following the
  * M3 baseline tonal mappings (surface containers, outlines, inverse roles...).
+ *
+ * Cached LRU by (mode, seed): preset switching re-uses the same seeds over and
+ * over and HCT scheme construction is pure, so identical inputs must never
+ * recompute on the main thread.
  */
+const SCHEME_CACHE_LIMIT = 48;
+const schemeCache = new Map<string, M3Scheme>();
+
 export function buildScheme(sourceHex: string, mode: M3Mode): M3Scheme {
   const source = normalizeHex(sourceHex);
+  const cacheKey = `${mode}:${source}`;
+  const cached = schemeCache.get(cacheKey);
+  if (cached) {
+    // Refresh recency for the LRU.
+    schemeCache.delete(cacheKey);
+    schemeCache.set(cacheKey, cached);
+    return cached;
+  }
+
   const dark = mode === "dark";
   const scheme = new SchemeTonalSpot(Hct.fromInt(argbFromHex(source.slice(1))), dark, 0.0);
   const role = (name: string) => hexFromArgb(scheme[name as keyof SchemeTonalSpot] as number);
@@ -116,7 +146,7 @@ export function buildScheme(sourceHex: string, mode: M3Mode): M3Scheme {
     inactiveFg: hexFromArgb(scheme.neutralPalette.tone(dark ? 60 : 50)),
   };
 
-  return {
+  const built: M3Scheme = {
     source,
     mode,
     roles,
@@ -132,6 +162,13 @@ export function buildScheme(sourceHex: string, mode: M3Mode): M3Scheme {
       cyan,
     },
   };
+
+  if (schemeCache.size >= SCHEME_CACHE_LIMIT) {
+    const oldest = schemeCache.keys().next().value;
+    if (oldest !== undefined) schemeCache.delete(oldest);
+  }
+  schemeCache.set(cacheKey, built);
+  return built;
 }
 
 function kebab(key: string): string {

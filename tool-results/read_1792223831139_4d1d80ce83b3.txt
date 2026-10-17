@@ -1,0 +1,665 @@
+     1→"use client";
+     2→
+     3→import { useEffect, useRef, useState } from "react";
+     4→import {
+     5→  BatteryFull,
+     6→  Download,
+     7→  FileText,
+     8→  Film,
+     9→  Folder,
+    10→  Home,
+    11→  Image as ImageIcon,
+    12→  Music,
+    13→  Palette,
+    14→  Settings,
+    15→  Trash2,
+    16→  Volume2,
+    17→  Wifi,
+    18→} from "lucide-react";
+    19→import { M3Chip, SectionHeader } from "./primitives";
+    20→import type { M3Mode } from "@/lib/m3/theme";
+    21→
+    22→const WALLPAPERS = [
+    23→  { id: "light", src: "/wallpapers/m3-wallpaper-light.png", label: "Light" },
+    24→  { id: "dark", src: "/wallpapers/m3-wallpaper-dark.png", label: "Dark" },
+    25→  { id: "bloom", src: "/wallpapers/m3-wallpaper-bloom.png", label: "Bloom" },
+    26→] as const;
+    27→
+    28→type WallId = (typeof WALLPAPERS)[number]["id"];
+    29→
+    30→/* ------------------------------------------------------------------ */
+    31→/*  Draggable Plasma desktop (md+)                                     */
+    32→/*                                                                     */
+    33→/*  The mock windows are real windows now: grab a title bar and move   */
+    34→/*  them anywhere on the desktop. The drag pipeline is built so the    */
+    35→/*  page itself never reacts — no text selection, no native image      */
+    36→/*  drag, no scroll-to-top, no history spam:                           */
+    37→/*   • pointer capture on the title bar (moves keep streaming even     */
+    38→/*     when the pointer leaves the element)                            */
+    39→/*   • pointerdown preventDefault + html.window-dragging user-select   */
+    40→/*     lock kill selection auto-scroll (the "cursor flies to top" bug) */
+    41→/*   • transform-only visual updates, committed to layout once         */
+    42→/*   • arrow-key + Home keyboard equivalent for the same actions       */
+    43→/* ------------------------------------------------------------------ */
+    44→
+    45→type WinId = "dolphin" | "konsole" | "settings";
+    46→
+    47→interface WinGeom {
+    48→  /** position + size as fractions of the desktop canvas */
+    49→  x: number;
+    50→  y: number;
+    51→  w: number;
+    52→  h: number;
+    53→  z: number;
+    54→}
+    55→
+    56→const DEFAULT_GEOM: Record<WinId, Omit<WinGeom, "z">> = {
+    57→  dolphin: { x: 0.025, y: 0.07, w: 0.34, h: 0.58 },
+    58→  konsole: { x: 0.28, y: 0.3, w: 0.5, h: 0.6 },
+    59→  settings: { x: 0.6, y: 0.06, w: 0.375, h: 0.52 },
+    60→};
+    61→
+    62→const WINDOWS: { id: WinId; title: string; label: string }[] = [
+    63→  { id: "dolphin", title: "Dolphin — Home", label: "Dolphin" },
+    64→  { id: "konsole", title: "user@kubuntu: ~", label: "Konsole" },
+    65→  { id: "settings", title: "System Settings", label: "System Settings" },
+    66→];
+    67→
+    68→const initialGeoms = (): Record<WinId, WinGeom> => ({
+    69→  dolphin: { ...DEFAULT_GEOM.dolphin, z: 10 },
+    70→  konsole: { ...DEFAULT_GEOM.konsole, z: 30 },
+    71→  settings: { ...DEFAULT_GEOM.settings, z: 20 },
+    72→});
+    73→
+    74→const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+    75→
+    76→/* ----------------------------- contents ---------------------------- */
+    77→
+    78→function SideEntry({
+    79→  icon: Icon,
+    80→  label,
+    81→  active,
+    82→}: {
+    83→  icon: typeof Folder;
+    84→  label: string;
+    85→  active?: boolean;
+    86→}) {
+    87→  return (
+    88→    <div
+    89→      className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[10px] sm:text-[11px] ${
+    90→        active
+    91→          ? "bg-[var(--m3-secondary-container)] font-medium text-[var(--m3-on-secondary-container)]"
+    92→          : "text-[var(--m3-on-surface-variant)]"
+    93→      }`}
+    94→    >
+    95→      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+    96→      <span className="truncate">{label}</span>
+    97→    </div>
+    98→  );
+    99→}
+   100→
+   101→function DolphinContent() {
+   102→  return (
+   103→    <div className="flex h-full">
+   104→      <div className="w-[86px] shrink-0 space-y-0.5 border-r border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-1.5 sm:w-28">
+   105→        {[
+   106→          { icon: Home, label: "Home", active: true },
+   107→          { icon: FileText, label: "Documents" },
+   108→          { icon: ImageIcon, label: "Pictures" },
+   109→          { icon: Download, label: "Downloads" },
+   110→          { icon: Trash2, label: "Trash" },
+   111→        ].map(({ icon: Icon, label, active }) => (
+   112→          <SideEntry key={label} icon={Icon} label={label} active={active} />
+   113→        ))}
+   114→      </div>
+   115→      <div className="flex flex-1 flex-col bg-[var(--m3-surface)]">
+   116→        <div className="flex items-center gap-1.5 border-b border-[var(--m3-outline-variant)] p-2">
+   117→          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--m3-surface-container-highest)] text-[10px] text-[var(--m3-on-surface-variant)]">
+   118→            ‹
+   119→          </span>
+   120→          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--m3-surface-container-highest)] text-[10px] text-[var(--m3-on-surface-variant)]">
+   121→            ›
+   122→          </span>
+   123→          <span className="ml-1 flex h-5 flex-1 items-center rounded-full bg-[var(--m3-surface-container-highest)] px-2.5 text-[10px] text-[var(--m3-on-surface-variant)]">
+   124→            /home/m3
+   125→          </span>
+   126→        </div>
+   127→        <div className="grid flex-1 grid-cols-2 content-start gap-1.5 p-2 sm:grid-cols-3">
+   128→          {[
+   129→            { icon: Folder, label: "Design", bg: "var(--m3-primary-container)", fg: "var(--m3-on-primary-container)" },
+   130→            { icon: Music, label: "Music", bg: "var(--m3-tertiary-container)", fg: "var(--m3-on-tertiary-container)" },
+   131→            { icon: ImageIcon, label: "Walls", bg: "var(--m3-secondary-container)", fg: "var(--m3-on-secondary-container)" },
+   132→            { icon: Film, label: "Movies", bg: "var(--m3-primary-container)", fg: "var(--m3-on-primary-container)" },
+   133→            { icon: FileText, label: "Notes", bg: "var(--m3-tertiary-container)", fg: "var(--m3-on-tertiary-container)" },
+   134→          ].map(({ icon: Icon, label, bg, fg }) => (
+   135→            <div
+   136→              key={label}
+   137→              className="flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 transition-transform hover:scale-105"
+   138→              style={{ background: bg, color: fg }}
+   139→            >
+   140→              <Icon className="h-5 w-5" aria-hidden="true" />
+   141→              <span className="text-[10px] font-medium">{label}</span>
+   142→            </div>
+   143→          ))}
+   144→        </div>
+   145→      </div>
+   146→    </div>
+   147→  );
+   148→}
+   149→
+   150→function KonsoleContent() {
+   151→  return (
+   152→    <pre className="m3-scroll h-full overflow-auto whitespace-pre-wrap break-words bg-[var(--m3-surface-container-lowest)] p-2.5 font-mono text-[9px] leading-[1.55] text-[var(--m3-on-surface)] sm:p-3.5 sm:text-[11px]">
+   153→      <span className="text-[var(--m3-primary)] font-medium">m3@kubuntu</span>
+   154→      <span className="text-[var(--m3-on-surface-variant)]">:</span>
+   155→      <span className="text-[var(--m3-tertiary)] font-medium">~</span>
+   156→      <span className="text-[var(--m3-on-surface-variant)]">$ </span>
+   157→      fastfetch{"\n"}
+   158→      <span className="text-[var(--m3-primary)]">        OS</span>{"  Kubuntu 24.04 LTS x86_64"}{"\n"}
+   159→      <span className="text-[var(--m3-secondary)]">    Kernel</span>{"  Linux 6.8.0-45-generic"}{"\n"}
+   160→      <span className="text-[var(--m3-tertiary)]">        DE</span>{"  KDE Plasma (M³ global theme)"}{"\n"}
+   161→      <span className="text-[var(--m3-warning)]">        WM</span>{"  KWin · rounded corners 16px"}{"\n"}
+   162→      <span className="text-[var(--m3-success)]">   Terminal</span>{"  konsole (M3 Kubuntu Dark)"}{"\n"}
+   163→      <span className="text-[var(--m3-on-surface-variant)]">     Theme</span>{"  "}
+   164→      <span style={{ color: "var(--m3-primary)" }}>███</span>{" "}
+   165→      <span style={{ color: "var(--m3-secondary)" }}>███</span>{" "}
+   166→      <span style={{ color: "var(--m3-tertiary)" }}>███</span>{" "}
+   167→      <span style={{ color: "var(--m3-success)" }}>███</span>{" "}
+   168→      <span style={{ color: "var(--m3-warning)" }}>███</span>{" "}
+   169→      <span style={{ color: "var(--m3-error)" }}>███</span>{"\n\n"}
+   170→      <span className="text-[var(--m3-primary)] font-medium">m3@kubuntu</span>
+   171→      <span className="text-[var(--m3-on-surface-variant)]">:</span>
+   172→      <span className="text-[var(--m3-tertiary)] font-medium">~</span>
+   173→      <span className="text-[var(--m3-on-surface-variant)]">$ </span>
+   174→      plasma-apply-colorscheme M3KubuntuDark{"\n"}
+   175→      <span className="text-[var(--m3-success)]">✓ Applied color scheme M3 Kubuntu Dark</span>{"\n\n"}
+   176→      <span className="text-[var(--m3-primary)] font-medium">m3@kubuntu</span>
+   177→      <span className="text-[var(--m3-on-surface-variant)]">:</span>
+   178→      <span className="text-[var(--m3-tertiary)] font-medium">~</span>
+   179→      <span className="text-[var(--m3-on-surface-variant)]">$ </span>
+   180→      <span className="animate-pulse">▌</span>
+   181→    </pre>
+   182→  );
+   183→}
+   184→
+   185→function SettingsContent({ mode }: { mode: M3Mode }) {
+   186→  return (
+   187→    <div className="flex h-full">
+   188→      <div className="w-28 shrink-0 space-y-0.5 border-r border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container-low)] p-1.5">
+   189→        {[
+   190→          { icon: Palette, label: "Colors", active: true },
+   191→          { icon: ImageIcon, label: "Wallpaper" },
+   192→          { icon: Settings, label: "Fonts" },
+   193→          { icon: Folder, label: "Icons" },
+   194→        ].map(({ icon: Icon, label, active }) => (
+   195→          <SideEntry key={label} icon={Icon} label={label} active={active} />
+   196→        ))}
+   197→      </div>
+   198→      <div className="flex-1 space-y-2 overflow-hidden bg-[var(--m3-surface)] p-3">
+   199→        <p className="text-[11px] font-medium text-[var(--m3-on-surface)]">
+   200→          Color schemes
+   201→        </p>
+   202→        {[
+   203→          { name: "M3 Kubuntu Dark", selected: mode === "dark" },
+   204→          { name: "M3 Kubuntu Light", selected: mode === "light" },
+   205→        ].map((s) => (
+   206→          <div
+   207→            key={s.name}
+   208→            className={`flex items-center gap-2.5 rounded-xl border p-2 ${
+   209→              s.selected
+   210→                ? "border-[var(--m3-primary)] bg-[var(--m3-primary-container)]"
+   211→                : "border-[var(--m3-outline-variant)] bg-[var(--m3-surface-container)]"
+   212→            }`}
+   213→          >
+   214→            <span
+   215→              className={`flex h-4 w-4 items-center justify-center rounded-full border-2 ${
+   216→                s.selected ? "border-[var(--m3-primary)]" : "border-[var(--m3-outline)]"
+   217→              }`}
+   218→            >
+   219→              {s.selected && (
+   220→                <span className="h-2 w-2 rounded-full bg-[var(--m3-primary)]" />
+   221→              )}
+   222→            </span>
+   223→            <div className="flex overflow-hidden rounded-md" aria-hidden="true">
+   224→              <span className="h-5 w-5" style={{ background: "var(--m3-surface)" }} />
+   225→              <span className="h-5 w-5" style={{ background: "var(--m3-primary)" }} />
+   226→              <span className="h-5 w-5" style={{ background: "var(--m3-secondary-container)" }} />
+   227→              <span className="h-5 w-5" style={{ background: "var(--m3-tertiary-container)" }} />
+   228→            </div>
+   229→            <span className="text-[11px] text-[var(--m3-on-surface)]">{s.name}</span>
+   230→            {s.selected && (
+   231→              <span className="ml-auto text-[9px] font-medium uppercase tracking-wide text-[var(--m3-on-primary-container)]">
+   232→                Active
+   233→              </span>
+   234→            )}
+   235→          </div>
+   236→        ))}
+   237→      </div>
+   238→    </div>
+   239→  );
+   240→}
+   241→
+   242→function DesktopWidgets() {
+   243→  return (
+   244→    <div className="pointer-events-none absolute bottom-[3.5%] right-[2.5%] z-0 flex w-[24%] flex-col gap-2.5">
+   245→      <div className="flex flex-1 flex-col justify-between rounded-3xl bg-[var(--m3-primary-container)] p-4 text-[var(--m3-on-primary-container)] shadow-xl">
+   246→        <div className="flex items-center justify-between">
+   247→          <span className="text-xl font-bold">M³</span>
+   248→          <span className="rounded-full bg-black/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wide">
+   249→            Dynamic color
+   250→          </span>
+   251→        </div>
+   252→        <div>
+   253→          <p className="text-sm font-medium leading-snug">
+   254→            Wallpaper colors applied to system
+   255→          </p>
+   256→          <div className="mt-2.5 flex gap-1.5">
+   257→            {["primary", "secondary", "tertiary", "success", "warning", "error"].map(
+   258→              (role) => (
+   259→                <span
+   260→                  key={role}
+   261→                  className="h-4 w-4 rounded-full border border-black/10"
+   262→                  style={{ background: `var(--m3-${role})` }}
+   263→                />
+   264→              )
+   265→            )}
+   266→          </div>
+   267→        </div>
+   268→      </div>
+   269→      <div className="flex items-center gap-3 rounded-3xl bg-[var(--m3-inverse-surface)] p-3 text-[var(--m3-inverse-on-surface)] shadow-xl">
+   270→        <span className="text-2xl font-light leading-none tabular-nums">10:24</span>
+   271→        <span className="text-[10px] leading-tight opacity-80">
+   272→          Mon, May 12
+   273→          <br />
+   274→          Material clock widget
+   275→        </span>
+   276→      </div>
+   277→    </div>
+   278→  );
+   279→}
+   280→
+   281→/* ----------------------------- windows ----------------------------- */
+   282→
+   283→function WindowChrome({
+   284→  title,
+   285→  children,
+   286→}: {
+   287→  title: string;
+   288→  children: React.ReactNode;
+   289→}) {
+   290→  return (
+   291→    <>
+   292→      <div
+   293→        className="flex h-7 shrink-0 items-center gap-1.5 px-3 sm:h-8"
+   294→        style={{ background: "var(--m3-surface-container-high)" }}
+   295→      >
+   296→        <span className="truncate text-[10px] font-medium text-[var(--m3-on-surface)] sm:text-[11px]">
+   297→          {title}
+   298→        </span>
+   299→        <span
+   300→          className="ml-auto flex items-center gap-2 text-[var(--m3-on-surface-variant)]"
+   301→          aria-hidden="true"
+   302→        >
+   303→          <span className="h-0.5 w-2.5 rounded-full bg-current opacity-70" />
+   304→          <span className="h-2 w-2 rounded-[3px] border border-current opacity-70" />
+   305→          <span className="relative flex h-3 w-3 items-center justify-center opacity-70">
+   306→            <span className="absolute h-[1.5px] w-3 rotate-45 rounded-full bg-current" />
+   307→            <span className="absolute h-[1.5px] w-3 -rotate-45 rounded-full bg-current" />
+   308→          </span>
+   309→        </span>
+   310→      </div>
+   311→      <div className="min-h-0 flex-1">{children}</div>
+   312→    </>
+   313→  );
+   314→}
+   315→
+   316→/** Static window for the stacked small-screen layout (dragging is a
+   317→ *  fine-pointer interaction; touch keeps the tidy grid). */
+   318→function StaticWindow({
+   319→  title,
+   320→  minHeight,
+   321→  children,
+   322→}: {
+   323→  title: string;
+   324→  minHeight: number;
+   325→  children: React.ReactNode;
+   326→}) {
+   327→  return (
+   328→    <div
+   329→      className="flex min-h-0 flex-col overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/15"
+   330→      style={{ background: "var(--m3-surface-container-low)", minHeight }}
+   331→    >
+   332→      <WindowChrome title={title}>{children}</WindowChrome>
+   333→    </div>
+   334→  );
+   335→}
+   336→
+   337→/** Keep the title bar reachable: allow pushing a window partially out of
+   338→ *  the canvas but never further than 92% of its own size. */
+   339→function clampGeom(g: Omit<WinGeom, "z">): Omit<WinGeom, "z"> {
+   340→  return {
+   341→    ...g,
+   342→    x: clamp(g.x, -g.w + 0.08, 1 - 0.08),
+   343→    y: clamp(g.y, 0, 1 - 0.08),
+   344→  };
+   345→}
+   346→
+   347→interface DragRef {
+   348→  id: WinId;
+   349→  pointerId: number;
+   350→  startX: number;
+   351→  startY: number;
+   352→  /** last known-good pointer position — pointercancel events carry 0,0
+   353→   *  coords, so commits must never read clientX/Y off the end event */
+   354→  lastX: number;
+   355→  lastY: number;
+   356→  origin: Omit<WinGeom, "z">;
+   357→}
+   358→
+   359→export function DesktopPreview({ mode }: { mode: M3Mode }) {
+   360→  // Component is remounted on mode change (keyed by parent), so this only
+   361→  // initializes the default wallpaper for the current mode.
+   362→  const [wall, setWall] = useState<WallId>(mode === "dark" ? "dark" : "light");
+   363→
+   364→  const [geoms, setGeoms] = useState<Record<WinId, WinGeom>>(initialGeoms);
+   365→  const [draggingId, setDraggingId] = useState<WinId | null>(null);
+   366→
+   367→  const canvasRef = useRef<HTMLDivElement | null>(null);
+   368→  const winEls = useRef<Partial<Record<WinId, HTMLDivElement | null>>>({});
+   369→  const dragRef = useRef<DragRef | null>(null);
+   370→  const rafRef = useRef(0);
+   371→  const zRef = useRef(31);
+   372→
+   373→  const bringToFront = (id: WinId) => {
+   374→    zRef.current += 1;
+   375→    const z = zRef.current;
+   376→    setGeoms((prev) => (prev[id].z === z ? prev : { ...prev, [id]: { ...prev[id], z } }));
+   377→  };
+   378→
+   379→  const setGeom = (id: WinId, g: Omit<WinGeom, "z">) =>
+   380→    setGeoms((prev) => ({ ...prev, [id]: { ...prev[id], ...clampGeom(g) } }));
+   381→
+   382→  /* ---------------- pointer drag pipeline ---------------- */
+   383→
+   384→  const beginDrag = (id: WinId, e: React.PointerEvent<HTMLDivElement>) => {
+   385→    if (e.button !== 0 && e.pointerType === "mouse") return;
+   386→    // Kill text-selection auto-scroll and native drag at the root — this is
+   387→    // what previously sent the cursor/selection flying to the top of the page.
+   388→    e.preventDefault();
+   389→    const winEl = winEls.current[id];
+   390→    if (!winEl) return;
+   391→    // Canceling pointerdown also suppresses the click-focus, so focus the
+   392→    // handle here — preventScroll keeps focus from ever moving the page.
+   393→    e.currentTarget.focus({ preventScroll: true });
+   394→    try {
+   395→      e.currentTarget.setPointerCapture(e.pointerId);
+   396→    } catch {
+   397→      /* capture is best-effort; handlers still work while the pointer stays */
+   398→    }
+   399→    dragRef.current = {
+   400→      id,
+   401→      pointerId: e.pointerId,
+   402→      startX: e.clientX,
+   403→      startY: e.clientY,
+   404→      lastX: e.clientX,
+   405→      lastY: e.clientY,
+   406→      origin: { x: geoms[id].x, y: geoms[id].y, w: geoms[id].w, h: geoms[id].h },
+   407→    };
+   408→    setDraggingId(id);
+   409→    bringToFront(id);
+   410→    document.documentElement.classList.add("window-dragging");
+   411→  };
+   412→
+   413→  const moveDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+   414→    const d = dragRef.current;
+   415→    if (!d || e.pointerId !== d.pointerId) return;
+   416→    d.lastX = e.clientX;
+   417→    d.lastY = e.clientY;
+   418→    const dx = e.clientX - d.startX;
+   419→    const dy = e.clientY - d.startY;
+   420→    // Transform-only preview; layout commits once on release. Coalesced to
+   421→    // one write per frame so high-frequency events never thrash style.
+   422→    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+   423→    rafRef.current = requestAnimationFrame(() => {
+   424→      rafRef.current = 0;
+   425→      const el = winEls.current[d.id];
+   426→      if (el) el.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+   427→    });
+   428→  };
+   429→
+   430→  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+   431→    const d = dragRef.current;
+   432→    if (!d || e.pointerId !== d.pointerId) return;
+   433→    dragRef.current = null;
+   434→    if (rafRef.current) {
+   435→      cancelAnimationFrame(rafRef.current);
+   436→      rafRef.current = 0;
+   437→    }
+   438→    const el = winEls.current[d.id];
+   439→    const canvas = canvasRef.current;
+   440→    // Commit from the last known-good pointer position: pointercancel (which
+   441→    // can fire with 0,0 coords when e.g. a context menu takes over) must
+   442→    // never teleport the window toward the top-left corner.
+   443→    const dx = d.lastX - d.startX;
+   444→    const dy = d.lastY - d.startY;
+   445→    if (el) el.style.transform = "";
+   446→    if (canvas && (dx !== 0 || dy !== 0)) {
+   447→      const rect = canvas.getBoundingClientRect();
+   448→      if (rect.width > 0 && rect.height > 0) {
+   449→        setGeom(d.id, {
+   450→          x: d.origin.x + dx / rect.width,
+   451→          y: d.origin.y + dy / rect.height,
+   452→          w: d.origin.w,
+   453→          h: d.origin.h,
+   454→        });
+   455→      }
+   456→    }
+   457→    setDraggingId(null);
+   458→    document.documentElement.classList.remove("window-dragging");
+   459→  };
+   460→
+   461→  useEffect(() => {
+   462→    return () => {
+   463→      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+   464→      document.documentElement.classList.remove("window-dragging");
+   465→    };
+   466→  }, []);
+   467→
+   468→  /* ---------------- keyboard move (a11y parity) ---------------- */
+   469→
+   470→  const moveByKeyboard = (id: WinId, e: React.KeyboardEvent<HTMLDivElement>) => {
+   471→    const step = e.shiftKey ? 0.08 : 0.02;
+   472→    const g = geoms[id];
+   473→    switch (e.key) {
+   474→      case "ArrowLeft":
+   475→        setGeom(id, { ...g, x: g.x - step });
+   476→        break;
+   477→      case "ArrowRight":
+   478→        setGeom(id, { ...g, x: g.x + step });
+   479→        break;
+   480→      case "ArrowUp":
+   481→        setGeom(id, { ...g, y: g.y - step });
+   482→        break;
+   483→      case "ArrowDown":
+   484→        setGeom(id, { ...g, y: g.y + step });
+   485→        break;
+   486→      case "Home":
+   487→        setGeom(id, DEFAULT_GEOM[id]);
+   488→        break;
+   489→      default:
+   490→        return;
+   491→    }
+   492→    e.preventDefault();
+   493→    bringToFront(id);
+   494→  };
+   495→
+   496→  /* ---------------- render ---------------- */
+   497→
+   498→  return (
+   499→    <section id="preview" className="px-4 py-14 sm:py-20" aria-labelledby="preview-title">
+   500→      <div className="mx-auto max-w-6xl">
+   501→        <SectionHeader
+   502→          id="preview-title"
+   503→          eyebrow="Live mock"
+   504→          title={<>Live Plasma preview</>}
+   505→        >
+   506→          A faithful mock of Kubuntu with the generated theme applied —
+   507→          top panel, Dolphin, Konsole and System Settings, all tinted from
+   508→          your seed color. Grab a window&apos;s title bar to rearrange the
+   509→          desktop; arrow keys work too.
+   510→        </SectionHeader>
+   511→
+   512→        <div className="mt-6 flex flex-wrap items-center gap-2">
+   513→          <div role="group" aria-label="Choose preview wallpaper" className="flex gap-2">
+   514→            {WALLPAPERS.map((w) => (
+   515→              <M3Chip
+   516→                key={w.id}
+   517→                selected={wall === w.id}
+   518→                onClick={() => setWall(w.id)}
+   519→                ariaLabel={`Preview with ${w.label} wallpaper`}
+   520→              >
+   521→                {w.label}
+   522→              </M3Chip>
+   523→            ))}
+   524→          </div>
+   525→        </div>
+   526→
+   527→        <div className="relative mt-8 overflow-hidden rounded-[28px] shadow-2xl ring-1 ring-black/20">
+   528→          {/* Wallpaper — all three stacked and preloaded, crossfaded via opacity */}
+   529→          {WALLPAPERS.map((w) => (
+   530→            <img
+   531→              key={w.id}
+   532→              src={w.src}
+   533→              alt={`Material 3 ${w.label} wallpaper`}
+   534→              aria-hidden={wall !== w.id ? true : undefined}
+   535→              draggable={false}
+   536→              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 [transition-timing-function:var(--ease-enter)] ${
+   537→                wall === w.id ? "opacity-100" : "opacity-0"
+   538→              }`}
+   539→            />
+   540→          ))}
+   541→
+   542→          <div className="relative aspect-[16/11] md:aspect-[16/9]">
+   543→            {/* ---- Top panel ---- */}
+   544→            <div
+   545→              className="absolute inset-x-0 top-0 z-10 flex h-10 items-center gap-2 px-2 backdrop-blur-md sm:h-11 sm:px-3"
+   546→              style={{
+   547→                background: "color-mix(in srgb, var(--m3-surface-container) 82%, transparent)",
+   548→              }}
+   549→            >
+   550→              <img
+   551→                src="/zyntrix/svg/zyntrix-app-icon.svg"
+   552→                alt=""
+   553→                width={28}
+   554→                height={28}
+   555→                aria-hidden="true"
+   556→                draggable={false}
+   557→                className="h-7 w-7 shrink-0"
+   558→              />
+   559→              <span className="hidden rounded-full bg-[var(--m3-primary-container)] px-3 py-1 text-[11px] font-medium text-[var(--m3-on-primary-container)] sm:block">
+   560→                Dolphin
+   561→              </span>
+   562→              <span className="hidden rounded-full px-2 py-1 text-[11px] text-[var(--m3-on-surface-variant)] sm:block">
+   563→                Konsole
+   564→              </span>
+   565→              <span className="ml-auto flex items-center gap-2.5 text-[var(--m3-on-surface)]">
+   566→                <Wifi className="h-3.5 w-3.5" aria-hidden="true" />
+   567→                <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+   568→                <BatteryFull className="h-3.5 w-3.5" aria-hidden="true" />
+   569→                <span className="rounded-md px-1.5 py-0.5 text-[11px] font-medium tabular-nums">
+   570→                  10:24
+   571→                </span>
+   572→              </span>
+   573→            </div>
+   574→
+   575→            {/* ---- Small screens: calm stacked grid ---- */}
+   576→            <div className="absolute inset-x-0 bottom-0 top-10 grid gap-2.5 p-2.5 sm:top-11 md:hidden">
+   577→              <StaticWindow title="Dolphin — Home" minHeight={0}>
+   578→                <DolphinContent />
+   579→              </StaticWindow>
+   580→              <StaticWindow title="user@kubuntu: ~" minHeight={0}>
+   581→                <KonsoleContent />
+   582→              </StaticWindow>
+   583→            </div>
+   584→
+   585→            {/* ---- md+: real draggable desktop (always mounted — CSS picks
+   586→                 the layout, so hydration and first paint agree) ---- */}
+   587→            <div
+   588→              ref={canvasRef}
+   589→              className="absolute inset-x-0 bottom-0 top-10 hidden sm:top-11 md:block"
+   590→              role="group"
+   591→              aria-label="Plasma desktop — windows are draggable"
+   592→            >
+   593→              <DesktopWidgets />
+   594→              {WINDOWS.map(({ id, title, label }) => {
+   595→                    const g = geoms[id];
+   596→                    const isDragging = draggingId === id;
+   597→                    return (
+   598→                      <div
+   599→                        key={id}
+   600→                        ref={(el) => {
+   601→                          winEls.current[id] = el;
+   602→                        }}
+   603→                        onDragStart={(e) => e.preventDefault()}
+   604→                        className={`absolute flex min-h-0 flex-col overflow-hidden rounded-2xl ring-1 ring-black/15 ${
+   605→                          isDragging
+   606→                            ? "shadow-[0_24px_70px_-12px_rgba(0,0,0,0.65)]"
+   607→                            : "shadow-xl"
+   608→                        }`}
+   609→                        style={{
+   610→                          background: "var(--m3-surface-container-low)",
+   611→                          left: `${g.x * 100}%`,
+   612→                          top: `${g.y * 100}%`,
+   613→                          width: `${g.w * 100}%`,
+   614→                          height: `${g.h * 100}%`,
+   615→                          zIndex: g.z,
+   616→                          willChange: isDragging ? "transform" : undefined,
+   617→                        }}
+   618→                      >
+   619→                        <div
+   620→                          role="button"
+   621→                          tabIndex={0}
+   622→                          aria-label={`${label} window — drag to move, or use arrow keys (Shift for larger steps), Home to reset`}
+   623→                          onPointerDown={(e) => beginDrag(id, e)}
+   624→                          onPointerMove={moveDrag}
+   625→                          onPointerUp={endDrag}
+   626→                          onPointerCancel={endDrag}
+   627→                          onLostPointerCapture={endDrag}
+   628→                          onKeyDown={(e) => moveByKeyboard(id, e)}
+   629→                          onFocus={() => bringToFront(id)}
+   630→                          className={`flex h-7 shrink-0 touch-none items-center gap-1.5 px-3 outline-offset-[-2px] sm:h-8 ${
+   631→                            isDragging ? "cursor-grabbing" : "cursor-grab"
+   632→                          }`}
+   633→                          style={{ background: "var(--m3-surface-container-high)" }}
+   634→                        >
+   635→                          <span className="truncate text-[10px] font-medium text-[var(--m3-on-surface)] sm:text-[11px]">
+   636→                            {title}
+   637→                          </span>
+   638→                          <span
+   639→                            className="ml-auto flex items-center gap-2 text-[var(--m3-on-surface-variant)]"
+   640→                            aria-hidden="true"
+   641→                          >
+   642→                            <span className="h-0.5 w-2.5 rounded-full bg-current opacity-70" />
+   643→                            <span className="h-2 w-2 rounded-[3px] border border-current opacity-70" />
+   644→                            <span className="relative flex h-3 w-3 items-center justify-center opacity-70">
+   645→                              <span className="absolute h-[1.5px] w-3 rotate-45 rounded-full bg-current" />
+   646→                              <span className="absolute h-[1.5px] w-3 -rotate-45 rounded-full bg-current" />
+   647→                            </span>
+   648→                          </span>
+   649→                        </div>
+   650→                        <div className="min-h-0 flex-1">
+   651→                          {id === "dolphin" && <DolphinContent />}
+   652→                          {id === "konsole" && <KonsoleContent />}
+   653→                          {id === "settings" && <SettingsContent mode={mode} />}
+   654→                        </div>
+   655→                      </div>
+   656→                    );
+   657→                  })}
+   658→                </div>
+   659→          </div>
+   660→        </div>
+   661→      </div>
+   662→    </section>
+   663→  );
+   664→}
+   665→

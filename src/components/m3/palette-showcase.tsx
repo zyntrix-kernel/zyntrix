@@ -2,8 +2,12 @@
 
 import { motion, type Variants } from "framer-motion";
 import { Check } from "lucide-react";
-import { hexFromArgb } from "@material/material-color-utilities";
-import { SHOWCASE_TONES, toneIsDark, type M3Scheme } from "@/lib/m3/theme";
+import {
+  SHOWCASE_TONES,
+  toneIsDark,
+  toneToHex,
+  type M3Scheme,
+} from "@/lib/m3/theme";
 import { cn } from "@/lib/utils";
 import {
   StateLayer,
@@ -71,7 +75,8 @@ export function PaletteShowcase({ scheme }: { scheme: M3Scheme }) {
                   className="flex gap-1.5"
                 >
                   {SHOWCASE_TONES.map((tone) => {
-                    const hex = hexFromArgb(scheme.palettes[key].tone(tone));
+                    // Cached resolver — the grid resolves 72 tones per render
+                    const hex = toneToHex(scheme.palettes[key], tone);
                     const done = copied === `${key}-${tone}`;
                     return (
                       <ToneCell

@@ -120,17 +120,20 @@ const COPY: ChapterCopy[] = [
 export function StorySection({
   source,
   mode,
+  scheme,
   onSourceChange,
   onModeChange,
 }: {
   source: string;
   mode: M3Mode;
+  /** Single source of truth — page.tsx builds (and caches) one scheme for
+   *  the whole artifact; the story must not fork its own copy. */
+  scheme: M3Scheme;
   onSourceChange: (hex: string) => void;
   onModeChange: (m: M3Mode) => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [chapter, setChapter] = useState(0);
-  const scheme = useMemo(() => buildScheme(source, mode), [source, mode]);
 
   const { scrollYProgress } = useScroll({
     target: trackRef,

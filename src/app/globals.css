@@ -225,10 +225,9 @@
   }
   .ripple-ink { display: none; }
   .state-layer { transition: none; }
-  /* Retint and decor keep only opacity/color feedback under reduced motion */
-  [data-retint="true"],
-  [data-retint="true"] * {
-    transition-duration: 0.01ms !important;
+  /* The retint veil is motion — drop it; colors still swap instantly */
+  [data-retint="true"]::after {
+    animation: none;
   }
 }
 
@@ -305,6 +304,21 @@ html {
   scroll-padding-top: 6rem;
 }
 
+/* Long-page render isolation: the studio is ~12k px tall, and a seed re-tint
+   used to re-raster all of it. `content-visibility: auto` lets the browser
+   skip style/layout/paint for offscreen sections (box size is remembered),
+   so clicking a preset repaints only what the visitor can actually see.
+   Progressive enhancement — engines without support simply ignore it. */
+#customize,
+#preview,
+#palette,
+#components,
+#download,
+#install {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
 /* Gradient display text */
 .text-gradient {
   background: linear-gradient(
@@ -373,21 +387,42 @@ html {
   pointer-events: none;
 }
 
-/* Live re-tint window: the root flips [data-retint] for ~450 ms whenever the
-   seed color or mode changes. Only colors glide; element transition utilities
-   (transform, shadow…) stay untouched outside the window. */
-[data-retint="true"],
-[data-retint="true"] * {
-  transition:
-    background-color 420ms ease,
-    border-color 420ms ease,
-    color 420ms ease,
-    fill 420ms ease,
-    stroke 420ms ease;
+/* Live re-tint beat: when the seed or mode changes, the root flips
+   [data-retint] for ~560 ms. Colors themselves swap instantly — the old
+   `*`-level color-transition window forced a style recalc over every node
+   and ran thousands of main-thread color animations at once, which is what
+   made preset switching lag. The beat now lives in ONE fixed, pointer-
+   transparent veil (opacity-only, compositor-driven) while the small
+   interactive controls keep their own authored color transitions. */
+@keyframes m3-retint-veil {
+  0% { opacity: 0; }
+  28% { opacity: 1; }
+  100% { opacity: 0; }
+}
+[data-retint="true"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 45%,
+    color-mix(in srgb, var(--m3-primary) 8%, transparent),
+    transparent 72%
+  );
+  opacity: 0;
+  animation: m3-retint-veil 0.5s var(--ease-enter) forwards;
+  will-change: opacity;
 }
 
-/* Refined scrollbars — global, thin and tonal */
-* {
+/* Refined scrollbars — thin and tonal. Scoped to the page root and explicit
+   scroll containers (was universal `*`): a document-wide dependency on
+   --m3-on-surface made every element's computed style change on each seed
+   swap, adding a whole-document recalc to every re-tint. */
+html,
+.m3-scroll,
+pre,
+textarea {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--m3-on-surface, #1d1b20) 28%, transparent) transparent;
 }
