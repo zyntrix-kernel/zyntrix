@@ -55,7 +55,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    /* Dark from the very first paint: the class is static, so SSR and the
+       client agree — no flash, no hydration mismatch, ever. */
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body
         className={`${roboto.variable} ${robotoMono.variable} antialiased bg-background text-foreground`}
       >

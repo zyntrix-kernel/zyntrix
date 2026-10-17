@@ -134,3 +134,38 @@ Work Log:
 Stage Summary:
 - The premium pass is guided by the OpenDesign skill library and lands three systemic upgrades: one motion language (named curves, explicit property lists, shared-layout continuity, reduced-motion coverage for JS animations), a corrected cascade (retint window + no position in card classes — two real bugs found and fixed), and consistent premium rhythm (eyebrow headers, tabular numerals, hover-gated motion, footer-aware FAB).
 - Browser-verified end to end on desktop + mobile; all interactions and API routes healthy; worklog entries from 4-a/4-b above.
+
+---
+Task ID: P0-fixes
+Agent: Z.ai Code (main)
+Task: P0-1 dark-from-start; P0-2 window drag jumping cursor/page to top (user: "ITS MOVING THE CUROS TO THE TOP WHEN I TRY TO DRAG THE WINDOWS IT STILLS DRAGS")
+
+Work Log:
+- Inspected real tree: page is dark by useState default but scaffold tokens were light-first (:root = white, no `dark` class on <html>) → body chrome/overscroll painted white.
+- P0-1: layout.tsx now renders <html className="dark"> statically (SSR/CSR agree, no flash, no hydration risk); globals.css :root IS the dark palette, `.light` kept for shadcn switchability; color-scheme: dark on :root.
+- P0-2 root cause: desktop-preview had NO drag system — user drags triggered native text-selection auto-scroll (selection "flies" up the page) + native image drag; also pointercancel events carry clientX/Y=0 which would have committed windows toward top-left once a drag system existed.
+- Rebuilt desktop-preview.tsx: md+ = real draggable desktop (3 windows, absolute % geometry, pointer capture, transform-only preview coalesced to rAF, commit-once layout, clamp keeps titlebar reachable, z-order bring-to-front); <md keeps calm stacked grid (CSS dual-render, hydration-safe). html.window-dragging user-select+cursor lock during drag; focus({preventScroll}) restores keyboard focus lost to pointerdown cancel; arrows/Shift-arrows/Home keyboard parity; pointercancel + lostpointercapture commit from last known-good coords (never 0,0).
+- Browser-verified (agent-browser): body lab(2.75)=black first paint, html.dark; real-input drag commits exact fractions (0.28→0.3017 for +65px), scrollY frozen during drag, no selection, no native drag (Chromium suppresses mousedown after canceled pointerdown), arrows move without page scroll, Home resets to defaults, clamp caps at 1-0.08, z advances; zero console/page errors. bun run lint clean; tsc clean under src/ except pre-existing scaffold noise.
+
+Stage Summary:
+- Dark-from-start is structural (static class + dark-first :root), not a hydration trick.
+- The Plasma mock is now genuinely interactive with a hardened drag pipeline (capture, transform-only, last-known-good commit, full keyboard parity).
+- Ready for PROJECT SINGULARITY cinema build.
+
+---
+Task ID: singularity
+Agent: Z.ai Code (main)
+Task: PROJECT SINGULARITY — rebuild Zyntrix as a real-time 3D, camera-driven, scroll-cinematic experience (user upload directive + "do it")
+
+Work Log:
+- Stage A audit: real tree = M3 theme engine (theme.ts, HCT SchemeTonalSpot), 9 studio sections, no prior 3D. Hero retired; H1 moved into the film's IGNITION overlay.
+- Installed three@0.186 (+types). Chose vanilla Three.js over R3F: one persistent renderer, one rAF loop, zero reconciler surprises, deterministic seek.
+- Built src/lib/cinema/: rail.ts (authored 24-waypoint camera rail, per-segment smoothstep/linear easing, pure f(progress) — bidirectional, no drift); palette.ts (ThemeBinder: the ONLY path from HCT scheme to world materials; every color resolved from real roles/tonal palettes; frame-rate-independent damping; born-settled materials); textures.ts (procedural 1024×640 Plasma desktop painted from the live scheme — Dolphin, Konsole, real SEED_PRESETS swatch row, scripted Product-Film beats as pure f(beat): swatch sweep → Apply press → terminal types `zyntrix apply` script → success + wallpaper tint); objects/ (emblem: extruded beveled Z on machined disc+ring, ember light; field: 4 HCT tonal ramps as rising slab arcs with open camera aisle + seed crystal; chamber: 6 instrument panels with emissive role gauges; stage: display assembly choreography + desktop screen; laptop: 8-part procedural dissection — display/deck/60 instanced keycaps/board/CPU+RAM/GPU+7-blade fan/thermal tube/battery/ports — explode→hold→reassemble→screen wake; interface: wallpaper/panel/windows/dock as Z-separated layers with frame gate; station: payoff workstation with breathing LED); world.ts (one scene along a single −Z journey axis, 9 chapters, chapter segmentation as single authority); engine.ts (renderer lifecycle, ACES tone mapping, authored dim studio environment via PMREM, DPR cap 1.75 + adaptive governor, visibility start/stop, context-loss handling, full dispose).
+- React layer: film-section.tsx (900vh track + sticky stage, chapter overlays with real copy, chapter nav rail with aria-current jumps, Instrument-Chamber HUD = REAL seed/mode controls bound to page state, "Enter the studio" CTA → #customize, progress flows engine-ward via refs — zero React renders in the hot path); film-canvas.tsx (client-only dynamic import, capability probe, theme sync). Poster fallback for reduced-motion/no-WebGL: same 9 chapters, real HCT tonal strips, live HUD, full copy.
+- page.tsx: FilmSection + studio wrapper (opaque, z-10) + footer; skip link "Skip the film".
+- Fixed during build (all browser-verified): (1) TonalPalette.tone() returns ARGB — every `#`+toString(16) hex was invalid 8-digit → THREE.Color silently stayed white; added theme.toneToHex + replaced all call sites. (2) Field arcs had slabs dead-center at x=0 — camera rammed a tone-95 slab; rebuilt arcs as two arms with open |angle|<0.34 corridor. (3) Z emblem buried in its disc (read as "7") — lifted to stand on the disc. (4) RoomEnvironment irradiance washed every shot gray — replaced with authored near-black studio softbox environment; floor made matte (grazing Fresnel was mirroring the env). (5) Binder damping started from constructor whites → load flash; materials now born settled. (6) Camera clipped the laptop deck on the screen fly-through; reveal had no dwell — rail restructured. (7) framer warning: root wrapper given relative.
+- Verified in real browser: ignition/theme-field/chamber/desktop/product-film/hardware/interface/reveal all render with real geometry + real scheme colors; product-film close-up shows the procedural Plasma desktop with live seed row; hardware shows live desktop on the laptop lid mid-dissection; studio tail opaque above canvas; film↔studio theme sync (Forest click → engine seed #1f6d4d); light mode coherent both in film and studio; drag regression PASS (exact commit, scroll frozen); chapter nav jumps work; mobile 390px composes; zero page errors; lint clean; tsc clean under src/.
+
+Stage Summary:
+- The page is now a continuous nine-chapter interactive software film (IGNITION → REVEAL) that lands in the fully functional studio; every world color derives from the real HCT engine; all motion is a pure function of scroll progress (scrub-safe both directions); reduced-motion/no-WebGL visitors get a designed static poster with live controls; the HOT/DISPLAY anti-lag architecture and all product features survive untouched.
+- Known headless-verification artifacts (not user-facing): rAF throttling in the sandbox slows progress smoothing convergence during screenshots; real-browser convergence ≈ 0.4s. Poster path is code-reviewed but could not be live-emulated (no reduced-motion emulation in the harness).

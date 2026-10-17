@@ -1,0 +1,724 @@
+     1→# ZYNTRIX // PROJECT SINGULARITY
+     2→## REAL-TIME CINEMATIC WEB EXPERIENCE
+     3→### Creative Direction · 3D Graphics · Scroll Choreography · Zero-Compromise Implementation
+     4→
+     5→You have already completed the previous Zyntrix implementation pass.
+     6→
+     7→That pass improved functionality, persistence, the AutoDemo player, the desktop preview, palette inspection, asset integrity, and various visual effects.
+     8→
+     9→Those improvements are not the finish line.
+    10→
+    11→**THE PREVIOUS PASS OPTIMIZED THE PRODUCT. THIS PASS MUST TRANSFORM THE ENTIRE EXPERIENCE.**
+    12→
+    13→I want a truly overengineered, cinematic, three-dimensional website with exceptional camera choreography, physical objects, real-time rendering, scroll-driven storytelling, complex scene transitions, extraordinary composition, and meticulous interaction design.
+    14→
+    15→The result must feel like a bespoke software product trailer fused with an interactive 3D environment.
+    16→
+    17→Do not give me another conventional landing page decorated with animated cards.
+    18→
+    19→Do not merely add more CSS transforms, glows, gradients, particles, or floating objects to the existing website.
+    20→
+    21→Do not confuse feature completeness with visual ambition.
+    22→
+    23→**I WANT THE CAMERA, THE WORLD, THE OBJECTS, THE LIGHTING, THE MATERIALS, THE SCROLL, AND THE PRODUCT STORY TO FUNCTION AS ONE COHERENT SYSTEM.**
+    24→
+    25→You are authorized to make substantial changes to the cinematic architecture, including introducing Three.js, React Three Fiber, Drei, or appropriate rendering and post-processing dependencies if the existing stack and performance budget justify them.
+    26→
+    27→Inspect the real repository first. Select the strongest practical implementation for this project, then build it.
+    28→
+    29→Do not ask for permission to proceed with individual improvements.
+    30→
+    31→Do not stop after producing a plan, concept image, storyboard, or technical proposal. Implement the actual website, run the permitted checks, inspect the result, and iterate.
+    32→
+    33→---
+    34→
+    35→# 01. THE CREATIVE BAR
+    36→
+    37→Think in terms of a premium, custom-directed real-time product film, not a template.
+    38→
+    39→The experience should exhibit:
+    40→
+    41→- Actual three-dimensional geometry with readable volume.
+    42→- Deliberate cinematic camera movement.
+    43→- Perspective that changes meaningfully as the visitor scrolls.
+    44→- Objects passing in front of and behind one another in three-dimensional space.
+    45→- Physically coherent lighting and convincing material differentiation.
+    46→- Real object rotation, translation, assembly, disassembly and transformation.
+    47→- Composition planned in camera space rather than arranged as a collection of centered widgets.
+    48→- Controlled depth of field where appropriate.
+    49→- Reflections, shadowing, emission and atmospheric perspective used purposefully.
+    50→- Sophisticated typography integrated into the world.
+    51→- Precisely choreographed transitions between scenes.
+    52→- Highly responsive interactions that remain connected to the actual theme engine.
+    53→
+    54→I want the kind of experience where someone scrolling the page instinctively understands that substantial creative and engineering work went into every second.
+    55→
+    56→The first impression must establish authority. The middle must reward exploration. The final reveal must deliver a genuine climax.
+    57→
+    58→The result should remain recognizably Zyntrix: technical, cinematic, refined, product-focused and unmistakably its own identity.
+    59→
+    60→## Things that are NOT acceptable
+    61→
+    62→- A full-screen WebGL starfield with ordinary HTML sections underneath, presented as a 3D website.
+    63→- CSS-transformed rectangles pretending to be sophisticated three-dimensional machinery.
+    64→- A static 3D object rotating forever without responding meaningfully to the story or scroll.
+    65→- A downloaded video pretending to be interactive real-time 3D.
+    66→- Random particles and floating labels with no narrative purpose.
+    67→- Endless purple glass cards.
+    68→- Huge quantities of generic bloom that obscure the actual product.
+    69→- Camera shake, exaggerated rotations or aggressive depth of field used to compensate for weak composition.
+    70→- Scene transitions consisting primarily of opacity changes.
+    71→- One giant canvas containing unrelated objects without a coherent spatial design.
+    72→- Huge source files used as a substitute for architecture.
+    73→- A visually impressive initial screenshot followed by mediocre scenes.
+    74→
+    75→**CSS 3D remains appropriate for interface elements and lightweight interactions. It is not an adequate substitute for real 3D geometry wherever the scene demands actual volume, lighting, depth or camera motion.**
+    76→
+    77→The existing shader-based WarpField can remain as part of the rendering system, but reconsider its role in the larger composition.
+    78→
+    79→---
+    80→
+    81→# 02. REIMAGINE THE EXPERIENCE AS A CONTINUOUS FILM
+    82→
+    83→Treat the existing page as raw material rather than a finished visual direction.
+    84→
+    85→Inspect the current hero, ControlDeck, AutoDemo, DeviceShowcase, PlasmaScreen and working studio before deciding how to connect them.
+    86→
+    87→Preserve the existing product capabilities and useful architecture. Rebuild the cinematic composition when the new direction genuinely requires it.
+    88→
+    89→The website should tell one escalating story:
+    90→
+    91→## SEQUENCE 00: DARKNESS / IGNITION
+    92→
+    93→Begin with restraint.
+    94→
+    95→A deep, nearly black environment. A faint suggestion of physical space. A controlled source of light. Small technical details become visible as the camera approaches.
+    96→
+    97→Introduce the Zyntrix identity through an authored three-dimensional reveal, not an oversized flat logo with a generic scale animation.
+    98→
+    99→Explore a physical emblem, layered geometric structure, machined surface, illuminated internal geometry or another visual concept that actually communicates the brand.
+   100→
+   101→The geometry, composition, lighting and typography must be intentionally designed.
+   102→
+   103→A logo reveal should create anticipation. It should not expose every visual idea in the opening second.
+   104→
+   105→## SEQUENCE 01: ENTER THE WORLD
+   106→
+   107→The visitor scrolls.
+   108→
+   109→The camera begins a continuous physical journey into the Zyntrix environment. Typography moves relative to the camera. A primary object occupies real space. The environment expands beyond the frame.
+   110→
+   111→Use the scroll to control the camera's position, target, orientation and composition.
+   112→
+   113→Explore dolly movement, orbital movement, parallax, controlled banking, foreground occlusion and changes in focal distance.
+   114→
+   115→Movement must have a purpose. A camera orbit reveals a form. A dolly reveals scale. A descent establishes depth. A traversal through an object reveals what it contains.
+   116→
+   117→Do not merely tilt the camera every time the visitor scrolls.
+   118→
+   119→## SEQUENCE 02: THE THEME ENGINE
+   120→
+   121→Turn Material 3 theme generation into a visual event.
+   122→
+   123→A single seed color becomes the source of a structured three-dimensional composition.
+   124→
+   125→Develop a compelling physical representation of the theme engine: a field of connected color-bearing objects, layered tonal structures, precisely aligned material samples, or an entirely different original visual system that fits the brand.
+   126→
+   127→As the camera moves, the visitor witnesses the structure develop and change.
+   128→
+   129→The seed must remain connected to the actual selected color.
+   130→
+   131→Where practical, build the visual representation from the real HCT scheme, tonal values and theme roles rather than unrelated decorative colors.
+   132→
+   133→Light and dark modes should produce meaningfully different presentations. Contrast should be communicated through actual generated values, not just a visual filter.
+   134→
+   135→The visual event must clarify that the seed controls a complete system.
+   136→
+   137→Do not turn color theory into random floating cubes. Every object must belong to a coherent spatial and narrative design.
+   138→
+   139→## SEQUENCE 03: THE INSTRUMENT CHAMBER
+   140→
+   141→The journey enters a carefully composed three-dimensional control environment.
+   142→
+   143→The existing HueDial, contrast control, mode switch and presets become part of the visual language.
+   144→
+   145→Explore a chamber of physical-looking instruments, framed displays, floating but spatially grounded panels, precision markings, subtle emissive indicators and layered surfaces.
+   146→
+   147→The camera travels between these elements as the story progresses.
+   148→
+   149→Objects must have correct occlusion, scale and perspective. Lighting must help distinguish foreground, midground and background.
+   150→
+   151→The actual interactive controls must remain accessible and functional. Do not sacrifice the existing anti-lag architecture to achieve the visuals.
+   152→
+   153→A visitor changing the seed should see the world react coherently to the new theme.
+   154→
+   155→## SEQUENCE 04: THE DESKTOP MATERIALIZES
+   156→
+   157→Show the actual Zyntrix theme shaping a desktop environment.
+   158→
+   159→The Plasma desktop should emerge as the culmination of the previous sequence rather than abruptly appearing inside another card.
+   160→
+   161→Explore a physical screen assembled from dimensional layers, a window system building itself, a spatial panel appearing in stages, or an original camera transition that connects the theme engine to the desktop.
+   162→
+   163→The camera may pass through the surface of a screen, move between layers of the interface, or reveal how interface components occupy the same world.
+   164→
+   165→Every transition should be spatially motivated.
+   166→
+   167→Keep the actual theme controls and HCT-generated color roles authoritative.
+   168→
+   169→The result must communicate the relationship between the theme engine and the working Plasma preview.
+   170→
+   171→## SEQUENCE 05: THE PRODUCT FILM
+   172→
+   173→The existing scripted desktop demonstration becomes an integrated cinematic sequence.
+   174→
+   175→Connect its narrative to the larger camera journey. Build toward a clear sequence of seed selection, tuning, contrast adjustment, mode change, terminal output and application.
+   176→
+   177→The interface can be staged in the 3D world, but user controls, labels, chapter navigation and accessible alternatives must remain real interface elements.
+   178→
+   179→Playback, pausing, chapter selection, seeking, manual scrolling and reduced-motion behavior must remain deterministic.
+   180→
+   181→Do not create a second independent animation system that becomes desynchronized from scroll.
+   182→
+   183→## SEQUENCE 06: HARDWARE REVELATION
+   184→
+   185→Make this the principal three-dimensional showcase.
+   186→
+   187→A laptop or another appropriately designed computer emerges into view as a physical object.
+   188→
+   189→The camera approaches, travels around it, changes elevation and discovers its structure.
+   190→
+   191→The machine separates into distinct components with believable spatial organization:
+   192→
+   193→- Display assembly.
+   194→- Keyboard and chassis.
+   195→- Logic board.
+   196→- Processor and memory.
+   197→- Graphics hardware.
+   198→- Thermal components.
+   199→- Power system.
+   200→
+   201→Each object must have real geometry, dimensional thickness, intentional materials, correct perspective and a controlled place in the composition.
+   202→
+   203→Avoid a pile of generic cubes. Build distinctive recognizable forms using appropriate custom or procedural geometry.
+   204→
+   205→The camera should be choreographed around the disassembly. Individual components may travel along carefully designed paths while the camera changes position to maintain readable composition.
+   206→
+   207→Bring the components together again through a distinct, controlled reassembly.
+   208→
+   209→Then develop a transition from physical hardware to the software displayed on its screen.
+   210→
+   211→Treat the boundary between the physical machine and the virtual operating system as a narrative opportunity.
+   212→
+   213→## SEQUENCE 07: ENTER THE SYSTEM
+   214→
+   215→The camera crosses the display boundary.
+   216→
+   217→The desktop interface becomes a three-dimensional composition of actual interface layers: wallpaper, desktop panel, terminal, file manager, widgets and dock.
+   218→
+   219→Use dimensional separation to communicate hierarchy and purpose.
+   220→
+   221→The layers may separate, rotate or travel along spatial paths, but the choreography must explain something about how the theme is applied to the interface.
+   222→
+   223→This should be one of the most visually sophisticated transitions on the page.
+   224→
+   225→Use correct foreground and background relationships. Keep text readable when it becomes important. Do not flatten the entire scene simply to fade it away.
+   226→
+   227→## SEQUENCE 08: THE REVEAL
+   228→
+   229→Pay off the visual story with an expansive, carefully composed final scene.
+   230→
+   231→Explore a complete desktop workstation, luminous display surfaces, a physically modeled computer tower, a restrained lighting environment and a final display of the themed Plasma desktop.
+   232→
+   233→This does not have to reproduce any particular prior composition. Develop the strongest original solution.
+   234→
+   235→The camera should arrive at a deliberate final composition through a clear sequence of movement and settling.
+   236→
+   237→The final scene must communicate that the visitor has reached the finished product.
+   238→
+   239→Then provide a prominent, functional route into the actual theme studio.
+   240→
+   241→The climax must feel earned by the preceding journey.
+   242→
+   243→## SEQUENCE 09: THE WORKING STUDIO
+   244→
+   245→The cinematic journey must lead naturally into the functional application.
+   246→
+   247→Preserve the real theme customizer, desktop preview, palette explorer, component gallery, downloads and installation documentation.
+   248→
+   249→It is acceptable for this part of the page to become more grounded and functional rather than remaining a constant barrage of cinematic spectacle.
+   250→
+   251→A great experience knows when to become quiet.
+   252→
+   253→The contrast between the film and the practical tools should feel deliberate, not like two unrelated websites stitched together.
+   254→
+   255→---
+   256→
+   257→# 03. BUILD A REAL 3D CAMERA SYSTEM
+   258→
+   259→Create a dedicated cinematic scene architecture.
+   260→
+   261→The exact implementation is your decision after examining the repository, but the system must support these capabilities.
+   262→
+   263→### A. A persistent real 3D world
+   264→
+   265→Prefer one coherent WebGL world for connected cinematic scenes when practical.
+   266→
+   267→Avoid repeatedly destroying and recreating the renderer between acts.
+   268→
+   269→Use actual Three.js geometry, materials, lights, cameras, and world-space transforms wherever genuine three-dimensional rendering is required.
+   270→
+   271→React Three Fiber is appropriate if it integrates cleanly with the existing React and Next.js stack. A direct Three.js implementation is also acceptable if it provides a clearer, more reliable architecture.
+   272→
+   273→Use a client-only rendering boundary where necessary. Keep server rendering and initial content stable, and do not allow the introduction of WebGL to cause hydration failures.
+   274→
+   275→### B. An authored camera rail
+   276→
+   277→Create a timeline or camera-path system with named waypoints, explicit durations or scroll ranges, controlled interpolation and documented transitions.
+   278→
+   279→The camera should support:
+   280→
+   281→- Dolly in and out.
+   282→- Lateral tracking.
+   283→- Vertical movement.
+   284→- Orbital movement around important objects.
+   285→- Changes of elevation.
+   286→- Carefully limited camera roll.
+   287→- Target tracking.
+   288→- Smooth changes of composition.
+   289→- Transitions between close-up detail and wide establishing shots.
+   290→
+   291→Use an appropriate interpolation strategy for each movement. Catmull-Rom or another spline approach may suit spatial paths, while carefully authored curves or quaternion interpolation may be better for other transitions.
+   292→
+   293→Do not allow spline overshoot to send the camera through unrelated objects or produce accidental framing.
+   294→
+   295→The camera path should have a clear visual intention at every major point.
+   296→
+   297→### C. Scroll as a cinematic transport
+   298→
+   299→Use normalized journey progress and carefully authored timeline segments.
+   300→
+   301→For each segment, define:
+   302→
+   303→- Entry and exit progress.
+   304→- Camera position and target.
+   305→- Camera orientation and relevant framing parameters.
+   306→- Important object transforms.
+   307→- Lighting changes.
+   308→- Scene events.
+   309→- Text and interaction timing.
+   310→- Transition conditions.
+   311→
+   312→Support bidirectional scrubbing.
+   313→
+   314→At any point in the cinematic journey, scrolling backward must reproduce the corresponding previous state without accumulated drift.
+   315→
+   316→Avoid building a new collection of competing per-component scroll hooks for every animated object.
+   317→
+   318→Use one authoritative progress source and derive all cinematic state from it wherever practical.
+   319→
+   320→The animation must be deterministic, seekable and safe to render again after resizing or rehydration.
+   321→
+   322→### D. Camera choreography, not camera noise
+   323→
+   324→Use the camera to reveal information.
+   325→
+   326→Begin with strong compositions and controlled movement. Change distance when scale matters. Orbit only when the object benefits from being seen from another angle. Use foreground objects to create depth and spatial reveals.
+   327→
+   328→Create moments when the camera settles before the next important event.
+   329→
+   330→Avoid continuous motion that gives the visitor no opportunity to appreciate the composition.
+   331→
+   332→Use inertia and easing sparingly. Scroll input itself should remain responsive.
+   333→
+   334→**The goal is not maximum camera movement. It is maximum meaning per camera movement.**
+   335→
+   336→---
+   337→
+   338→# 04. MODEL THE WORLD, DO NOT FAKE IT
+   339→
+   340→Build the visual environment from genuine three-dimensional assets.
+   341→
+   342→Prefer carefully authored procedural models where they provide control, clarity and maintainability.
+   343→
+   344→Create appropriate geometry for the signature object, hardware, displays, panels, structural elements and any other meaningful objects in the world.
+   345→
+   346→Use actual geometry for:
+   347→
+   348→- Silhouettes that must read from different angles.
+   349→- Objects that rotate close to the camera.
+   350→- Hardware components that separate.
+   351→- Objects whose cast shadows define the composition.
+   352→- Surfaces requiring convincing reflection or material response.
+   353→- Components that the camera physically travels around or through.
+   354→
+   355→CSS can still supply ordinary interface layout, accessible text, controls, captions and certain lightweight decorative elements.
+   356→
+   357→Avoid making everything three-dimensional merely because Three.js is available. A two-dimensional label should remain two-dimensional when it communicates information more clearly.
+   358→
+   359→Build an intentional mixture of real geometry and carefully layered interface elements.
+   360→
+   361→Do not use unlicensed assets or assets of uncertain provenance. If the ideal model is unavailable, create an authored procedural alternative rather than blocking the project on external asset hunting.
+   362→
+   363→---
+   364→
+   365→# 05. MATERIALS, LIGHTING AND OPTICAL QUALITY
+   366→
+   367→A real 3D renderer is only the beginning. The world needs an internally consistent visual system.
+   368→
+   369→Develop a lighting setup with a clear purpose.
+   370→
+   371→Explore:
+   372→
+   373→- Broad key lighting.
+   374→- Restrained rim lighting.
+   375→- Carefully controlled emissive elements.
+   376→- Environment-aware reflections.
+   377→- Contact shadows.
+   378→- Material-specific highlights.
+   379→- Screen emission and surrounding light spill.
+   380→- Atmospheric separation.
+   381→- Intentional color-temperature contrast.
+   382→- Realistic differences between metal, glass, polymer and display surfaces.
+   383→
+   384→Use proper physically based materials where appropriate.
+   385→
+   386→Distinguish surfaces through roughness, metallic response, normal detail, surface color and lighting, rather than coloring every object differently.
+   387→
+   388→Avoid making every material equally reflective. A few carefully chosen reflective surfaces will give the environment more depth than a world where everything is polished glass.
+   389→
+   390→Consider a subtle filmic tone-mapping approach and restrained post-processing where the renderer supports it.
+   391→
+   392→Depth of field must have a clear subject. Motion blur must correspond to actual movement. Bloom should emphasize controlled light sources rather than washing out the frame.
+   393→
+   394→Do not introduce a post-processing stack merely to advertise that one exists.
+   395→
+   396→Where high-end effects are too expensive or incompatible with the performance budget, design the scene so that its composition remains excellent without them.
+   397→
+   398→---
+   399→
+   400→# 06. SCENE TRANSITIONS: NO RANDOM FADE-AND-REPLACE
+   401→
+   402→Build transitions as physical events.
+   403→
+   404→Examples worth exploring include:
+   405→
+   406→- Traveling through the central geometry of the Zyntrix emblem.
+   407→- Moving through a field of tonal layers that reorganizes into the next scene.
+   408→- Passing behind a foreground object that reveals a new environment.
+   409→- A close-up display becoming the entire camera view.
+   410→- A mechanical assembly separating along controlled trajectories.
+   411→- Interface layers expanding into three-dimensional space.
+   412→- A light source illuminating the geometry that introduces the next act.
+   413→- A carefully choreographed pullback that changes the perceived scale of an object.
+   414→- A final camera movement that brings the physical product and software into one composition.
+   415→
+   416→These are possibilities, not instructions to use every trick.
+   417→
+   418→Design the transition around the information it needs to communicate.
+   419→
+   420→Use object continuity, consistent lighting, shared geometry and motivated camera paths to connect sequences.
+   421→
+   422→Where possible, an object or shape from one scene should become the visual basis of the next scene.
+   423→
+   424→Avoid unnecessary scene reloads, black frames, clipping through unrelated geometry, sudden camera snaps and arbitrary zooms.
+   425→
+   426→All transformations must remain coherent during reversed scrolling, seeking and viewport changes.
+   427→
+   428→---
+   429→
+   430→# 07. TYPOGRAPHY AND HTML INTEGRATION
+   431→
+   432→This must still be an exceptional website, not merely a WebGL experiment.
+   433→
+   434→Retain high-quality editorial typography with strong hierarchy and intentional line breaks.
+   435→
+   436→Design the relationship between physical 3D objects and screen-space typography.
+   437→
+   438→Explore text placed at controlled depths, camera-facing technical captions, spatial measurement markers, world-space labels, and crisp screen-space titles.
+   439→
+   440→Use these techniques only when they strengthen the composition.
+   441→
+   442→Important reading text should remain accessible, selectable when appropriate, and visually crisp.
+   443→
+   444→Do not position every heading at an arbitrary Z-depth. Screen-space UI is frequently the correct choice for usability.
+   445→
+   446→Provide proper contrast, focus indicators, headings, semantic structure and functional navigation.
+   447→
+   448→The visitor should always know what the product does and where the actual studio begins.
+   449→
+   450→---
+   451→
+   452→# 08. THE INTERACTION LAYER
+   453→
+   454→Every interaction must reinforce the experience.
+   455→
+   456→Investigate:
+   457→
+   458→- Pointer-responsive camera parallax during appropriate idle moments.
+   459→- Subtle object responses to pointer proximity.
+   460→- Interactive model inspection where it is genuinely useful.
+   461→- A responsive seed object that changes with the actual theme.
+   462→- Camera or composition adjustments that clarify important interactions.
+   463→- Deliberate hover, grab, selection and focus feedback.
+   464→- Navigation controls that jump to meaningful sections of the authored journey.
+   465→
+   466→Avoid allowing pointer movement to fight the scroll-driven camera.
+   467→
+   468→Keep pointer effects restrained and optional. Touch devices need sensible alternatives.
+   469→
+   470→Do not conceal critical navigation behind obscure gestures.
+   471→
+   472→An interaction that looks compelling but has no reliable keyboard or touch equivalent must not become a mandatory path through the website.
+   473→
+   474→---
+   475→
+   476→# 09. GRAPHICS ENGINEERING AND ARCHITECTURE
+   477→
+   478→You are explicitly authorized to introduce a real 3D rendering stack if warranted.
+   479→
+   480→Before doing so, inspect the actual dependencies and current rendering architecture.
+   481→
+   482→Make an informed choice between:
+   483→
+   484→- Three.js with an explicitly managed scene.
+   485→- React Three Fiber with reusable declarative scene components.
+   486→- Existing custom WebGL infrastructure extended into a larger renderer.
+   487→- A carefully isolated combination of WebGL cinematics and ordinary React UI.
+   488→
+   489→Do not combine multiple scene frameworks without a concrete justification.
+   490→
+   491→Organize the resulting code around a maintainable scene architecture. Separate camera timelines, reusable geometry, material definitions, lighting, scene orchestration, data bindings, and functional interface components.
+   492→
+   493→Avoid the architecture of one enormous TSX file that contains every object, shader, camera transform and UI label.
+   494→
+   495→Use explicit types and well-defined data contracts.
+   496→
+   497→Keep all real theme values connected to the existing HCT engine. Scene-specific presentation logic may transform those values artistically, but must not replace the theme engine.
+   498→
+   499→Ensure proper resource ownership and cleanup for:
+   500→
+   501→- WebGL renderers and contexts.
+   502→- Geometry and materials.
+   503→- Textures and render targets.
+   504→- Resize observers.
+   505→- Event listeners.
+   506→- Animation frames.
+   507→- Timelines and subscriptions.
+   508→- Audio resources, if retained.
+   509→- Temporarily loaded or generated assets.
+   510→
+   511→Avoid unnecessary allocation inside the rendering loop.
+   512→
+   513→Reuse geometry and materials when appropriate. Use instancing when it genuinely improves repeated-geometry performance.
+   514→
+   515→Load expensive assets lazily when suitable. Prevent WebGL initialization from blocking essential page content.
+   516→
+   517→Use explicit rendering and quality strategies appropriate to the actual implementation. Adaptive pixel ratio, reduced effects on weaker hardware and a static fallback are preferable to pretending every device can render the same scene at the same cost.
+   518→
+   519→---
+   520→
+   521→# 10. PERFORMANCE IS PART OF THE VISUAL DESIGN
+   522→
+   523→The camera and the theme controls must feel responsive.
+   524→
+   525→The original implementation contains a deliberately engineered HOT/DISPLAY theme pipeline, cached HCT scheme generation, guarded CSS-variable writes and React rendering isolation.
+   526→
+   527→Preserve these mechanisms.
+   528→
+   529→Do not introduce React renders on every pointer movement to drive a 3D object.
+   530→
+   531→Do not calculate an entire theme scheme unnecessarily on every animation frame.
+   532→
+   533→Do not update large sets of CSS variables every frame without guarding and deduplication.
+   534→
+   535→Do not force synchronous layouts to synchronize rendering with the 3D timeline.
+   536→
+   537→Avoid excessive draw calls, unnecessary shadow-casting lights, unbounded render targets, oversized textures and wasteful post-processing.
+   538→
+   539→Use the rendering-loop API correctly. Keep scroll-derived state and high-frequency transient state appropriately separated.
+   540→
+   541→Aim for an experience that remains responsive while the visitor continuously scrolls, changes themes and interacts with the studio.
+   542→
+   543→Measure where tooling permits. Identify actual bottlenecks rather than guessing.
+   544→
+   545→If a cinematic effect causes an unacceptable regression, redesign or optimize the effect. Do not simply remove all ambition to make performance easy.
+   546→
+   547→Conversely, do not sacrifice interaction responsiveness to preserve an effect that adds little visual value.
+   548→
+   549→---
+   550→
+   551→# 11. REDUCED MOTION, TOUCH AND FALLBACKS
+   552→
+   553→The cinematic experience must remain usable when motion is disabled or hardware is limited.
+   554→
+   555→For reduced-motion preferences, supply a genuinely designed static or minimally animated experience with the product, narrative and navigation intact.
+   556→
+   557→When WebGL is unavailable, fails to initialize or loses its context, provide a useful fallback rather than leaving the main page empty.
+   558→
+   559→Avoid making the browser download or initialize every cinematic asset before the visitor can read the page.
+   560→
+   561→Support touch scrolling without fighting native momentum.
+   562→
+   563→Keep important content outside the visual canvas in an accessible structure where appropriate.
+   564→
+   565→Handle viewport resizing without corrupting the camera path, changing the meaning of timeline progress, or leaving objects stranded outside the frame.
+   566→
+   567→The mobile version must be composed intentionally. It need not reproduce every desktop camera move if doing so would harm usability or performance.
+   568→
+   569→---
+   570→
+   571→# 12. DESIGN A REAL ART-DIRECTION SYSTEM
+   572→
+   573→Before implementation, inspect the whole experience and establish a coherent visual vocabulary.
+   574→
+   575→Determine the key silhouette, signature object, lighting philosophy, color strategy, material families, typography and transitions.
+   576→
+   577→Establish the intended framing at the principal narrative moments.
+   578→
+   579→Think in cinematic composition:
+   580→
+   581→- Foreground, midground and background.
+   582→- Negative space.
+   583→- Visual weight.
+   584→- Silhouette clarity.
+   585→- Focal hierarchy.
+   586→- Light direction.
+   587→- Movement direction.
+   588→- Subject scale.
+   589→- Contrast between wide shots and close-ups.
+   590→- Periods of movement and stillness.
+   591→
+   592→Use a restrained palette that works with the actual theme engine.
+   593→
+   594→Zyntrix blue should be meaningful. Violet should be purposeful. Other hues may appear when the current seed demands them.
+   595→
+   596→Do not assign arbitrary purple highlights to objects when the active theme should determine their appearance.
+   597→
+   598→The default theme must look excellent, but alternate seeds and both modes must remain visually coherent.
+   599→
+   600→Maintain recognizability across the entire site.
+   601→
+   602→Every visual flourish should reinforce the story, identify the product, explain a mechanism, create intentional emphasis or help the visitor navigate.
+   603→
+   604→Otherwise, remove it.
+   605→
+   606→---
+   607→
+   608→# 13. IMPLEMENTATION DIRECTIVE
+   609→
+   610→Do not stop after describing what you intend to do.
+   611→
+   612→Proceed immediately through the following stages.
+   613→
+   614→**Stage A: Inspect and map.**
+   615→
+   616→Read the actual source tree, package configuration, existing scene components, performance constraints and current implementation report. Establish which cinematic structures should be retained, upgraded or replaced.
+   617→
+   618→**Stage B: Establish the rendering foundation.**
+   619→
+   620→Implement the real 3D scene architecture, camera/timeline model, lighting and geometry strategy. Make sure the app still loads and the existing theme studio still works.
+   621→
+   622→**Stage C: Build the visual world.**
+   623→
+   624→Create the signature objects, environment, material system and initial camera choreography. Establish a coherent art direction before scattering details across the scene.
+   625→
+   626→**Stage D: Implement the continuous journey.**
+   627→
+   628→Connect the principal scenes through camera motion and meaningful spatial transitions. Give the major moments individual framing, timing and compositional intent.
+   629→
+   630→**Stage E: Integrate the product.**
+   631→
+   632→Connect the scene to the real theme seed, HCT system, Plasma previews, AutoDemo and studio navigation. Preserve the actual product functionality.
+   633→
+   634→**Stage F: Refine the trailer.**
+   635→
+   636→Review composition, pacing, typography, material response, shadows, camera curves, transitions, visual hierarchy and small interaction details. Correct weak scenes rather than layering effects on top of them.
+   637→
+   638→**Stage G: Verify.**
+   639→
+   640→Run the permitted quality checks, exercise navigation and theme controls, inspect desktop and mobile layouts, review console errors and assess rendering performance where tooling permits.
+   641→
+   642→Do not run `bun run build`. Continue to use the project's permitted development and lint workflow.
+   643→
+   644→If a stage reveals a fundamental weakness, fix it before proceeding.
+   645→
+   646→Do not invent asset availability, benchmark results or test success.
+   647→
+   648→Do not discard existing user changes.
+   649→
+   650→Do not create a parallel implementation of existing functionality when it can be integrated correctly into the new architecture.
+   651→
+   652→---
+   653→
+   654→# 14. ACCEPTANCE CRITERIA: WHAT COUNTS AS SUCCESS
+   655→
+   656→The resulting experience must demonstrate the following in the actual browser.
+   657→
+   658→**Real 3D:** principal objects have actual geometric volume, material response and correct depth relationships.
+   659→
+   660→**Real camera movement:** the perspective changes as the camera travels through a coherent, authored path.
+   661→
+   662→**Scroll-driven storytelling:** the visitor controls the narrative, and backward scrolling reconstructs previous states without drift.
+   663→
+   664→**Intentional transitions:** scenes are linked by spatial, narrative or compositional continuity rather than arbitrary effects.
+   665→
+   666→**Product integration:** the theme engine, seed changes and Plasma previews influence the appropriate parts of the experience.
+   667→
+   668→**Cinematic progression:** the visitor experiences an opening, escalation, transformation and payoff rather than ten unrelated visual tricks.
+   669→
+   670→**Visual consistency:** material, lighting, typography, composition and motion all belong to the same design language.
+   671→
+   672→**Working functionality:** navigation, demo controls, downloads and customizer operations retain their real behavior.
+   673→
+   674→**Resilience:** reduced-motion users, keyboard users, touch devices and constrained rendering environments receive usable alternatives.
+   675→
+   676→**Performance:** graphics complexity is engineered intentionally, with observable behavior and honest reporting of limitations.
+   677→
+   678→**Maintainability:** the new implementation has clear architecture, reusable scene components and a deterministic animation model.
+   679→
+   680→A single beautiful hero is not enough.
+   681→
+   682→A spectacular disassembly surrounded by ordinary disconnected sections is not enough.
+   683→
+   684→A high particle count is not enough.
+   685→
+   686→An expensive rendering pipeline is not enough.
+   687→
+   688→A huge diff is not enough.
+   689→
+   690→**The complete experience must demonstrate that the visuals, camera, story and product were designed together.**
+   691→
+   692→---
+   693→
+   694→# 15. FINAL ORDER
+   695→
+   696→Operate as the creative and technical lead responsible for the entire experience.
+   697→
+   698→Make high-confidence creative decisions. Choose an original visual direction that belongs to Zyntrix rather than copying a generic award-site aesthetic.
+   699→
+   700→Inspect the actual result. Identify what is still weak. Rewrite weak compositions. Improve camera paths. Rework material response. Eliminate gratuitous effects. Add missing depth where it changes the experience. Fix responsive and functional problems.
+   701→
+   702→Repeat until the result is as strong as the current environment allows.
+   703→
+   704→Do not optimize for source-code length, feature count, or the number of animations.
+   705→
+   706→Optimize for the sophistication of the finished experience.
+   707→
+   708→Do not confuse complexity with quality, and do not use simplicity as an excuse to avoid difficult implementation.
+   709→
+   710→**I WANT A REAL-TIME 3D, CAMERA-DRIVEN, SCROLL-CINEMATIC ZYNTRIX EXPERIENCE WITH EXTRAORDINARY IMPLEMENTATION AND ABSOLUTE INTENTIONALITY.**
+   711→
+   712→Build the world.
+   713→
+   714→Direct the camera.
+   715→
+   716→Choreograph the transformations.
+   717→
+   718→Make the product part of the story.
+   719→
+   720→Then verify the result.
+   721→
+   722→**THE STANDARD IS NOT “A VERY GOOD WEBSITE.” THE STANDARD IS A COHESIVE INTERACTIVE SOFTWARE FILM THAT COULD NOT BE CONFUSED WITH A GENERIC TEMPLATE.**
+   723→
+   724→Implement it now.

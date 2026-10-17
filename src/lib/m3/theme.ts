@@ -10,6 +10,11 @@ export type M3Mode = "light" | "dark";
 
 export const DEFAULT_SOURCE = "#67548a";
 
+/** tone(t) of a tonal palette → proper #rrggbb (tone() is ARGB!). */
+export function toneToHex(p: TonalPalette, t: number): string {
+  return hexFromArgb(p.tone(t));
+}
+
 /** Wallpaper assets shipped with the theme (client-safe constants) */
 export const WALLPAPER_FILES = [
   "m3-wallpaper-light.png",

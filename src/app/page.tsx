@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useScroll, useSpring, MotionConfig } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { TopBar } from "@/components/m3/top-bar";
-import { Hero } from "@/components/m3/hero";
+import { FilmSection } from "@/components/cinema/film-section";
 import { Customizer } from "@/components/m3/customizer";
 import { DesktopPreview } from "@/components/m3/desktop-preview";
 import { PaletteShowcase } from "@/components/m3/palette-showcase";
@@ -27,7 +27,7 @@ export default function Home() {
   const [footerVisible, setFooterVisible] = useState(false);
   const [retinting, setRetinting] = useState(false);
   const retintTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const footerRef = useRef<HTMLElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
 
   const scheme = useMemo(() => buildScheme(source, mode), [source, mode]);
   const cssVars = useMemo(
@@ -99,7 +99,7 @@ export default function Home() {
       <div
         id="top"
         data-retint={retinting ? "true" : "false"}
-        className="flex min-h-screen flex-col bg-[var(--m3-surface)] font-sans text-[var(--m3-on-surface)]"
+        className="relative flex min-h-screen flex-col bg-[var(--m3-surface)] font-sans text-[var(--m3-on-surface)]"
         style={{ ...cssVars, colorScheme: mode }}
       >
         {/* Scroll progress */}
@@ -113,25 +113,35 @@ export default function Home() {
           href="#customize"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-[var(--m3-primary)] focus:px-4 focus:py-2 focus:text-[var(--m3-on-primary)]"
         >
-          Skip to theme customizer
+          Skip the film — jump to the theme studio
         </a>
 
         <TopBar mode={mode} onToggleMode={handleToggleMode} />
 
         <main className="flex-1">
-          <Hero source={source} mode={mode} />
-          <Customizer
+          {/* SEQUENCES 00–08 — the cinematic journey (WebGL or poster) */}
+          <FilmSection
             source={source}
-            onSourceChange={handleSourceChange}
             mode={mode}
+            onSourceChange={handleSourceChange}
             onModeChange={handleModeChange}
-            roles={scheme.roles}
           />
-          <DesktopPreview key={mode} mode={mode} />
-          <PaletteShowcase scheme={scheme} />
-          <ComponentGallery />
-          <Downloads source={source} mode={mode} />
-          <InstallGuide mode={mode} />
+
+          {/* SEQUENCE 09 — the working studio, opaque over the film */}
+          <div className="relative z-10 bg-[var(--m3-surface)] shadow-[0_-24px_60px_rgba(0,0,0,0.35)]">
+            <Customizer
+              source={source}
+              onSourceChange={handleSourceChange}
+              mode={mode}
+              onModeChange={handleModeChange}
+              roles={scheme.roles}
+            />
+            <DesktopPreview mode={mode} />
+            <PaletteShowcase scheme={scheme} />
+            <ComponentGallery />
+            <Downloads source={source} mode={mode} />
+            <InstallGuide mode={mode} />
+          </div>
         </main>
 
         <div ref={footerRef}>
